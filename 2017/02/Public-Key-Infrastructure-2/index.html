@@ -1,0 +1,1028 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="技术,信息安全,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1">
+
+
+
+
+
+
+<meta name="description" content="本篇主要讲数字证书的相关概念和作用。">
+<meta name="keywords" content="技术,信息安全">
+<meta property="og:type" content="article">
+<meta property="og:title" content="公钥基础设施（二）：数字证书">
+<meta property="og:url" content="https://HaleLu.github.io/2017/02/Public-Key-Infrastructure-2/index.html">
+<meta property="og:site_name" content="Move your idea forward.">
+<meta property="og:description" content="本篇主要讲数字证书的相关概念和作用。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://halelu.github.io/2017/02/Public-Key-Infrastructure-2/pic-1.jpg">
+<meta property="og:image" content="http://halelu.github.io/2017/02/Public-Key-Infrastructure-2/pic-2.jpg">
+<meta property="og:image" content="http://halelu.github.io/2017/02/Public-Key-Infrastructure-2/pic-3.jpg">
+<meta property="og:image" content="http://halelu.github.io/2017/02/Public-Key-Infrastructure-2/pic-4.jpg">
+<meta property="og:image" content="http://halelu.github.io/2017/02/Public-Key-Infrastructure-2/pic-5.jpg">
+<meta property="og:updated_time" content="2019-06-28T05:38:32.227Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="公钥基础设施（二）：数字证书">
+<meta name="twitter:description" content="本篇主要讲数字证书的相关概念和作用。">
+<meta name="twitter:image" content="http://halelu.github.io/2017/02/Public-Key-Infrastructure-2/pic-1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6279916590628603000,
+      author: '（博主大人~）'
+    }
+  };
+</script>
+
+  <title> 公钥基础设施（二）：数字证书 | Move your idea forward. </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-77199457-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Move your idea forward.</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Hale Lu's Blog</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                公钥基础设施（二）：数字证书
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-02-12T10:05:54+08:00" content="2017-02-12">
+              2017-02-12
+            </time>
+          </span>
+
+          
+            <span class="post-category">
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/02/Public-Key-Infrastructure-2/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/Public-Key-Infrastructure-2/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/02/Public-Key-Infrastructure-2/" class="leancloud_visitors" data-flag-title="公钥基础设施（二）：数字证书">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本篇主要讲数字证书的相关概念和作用。</p>
+<a id="more"></a>
+
+<h2 id="认识数字证书"><a href="#认识数字证书" class="headerlink" title="认识数字证书"></a>认识数字证书</h2><h3 id="直观认识"><a href="#直观认识" class="headerlink" title="直观认识"></a>直观认识</h3><p>我们先选择任意一个HTTPS的网站（例如<a href="https://www.baidu.com/" target="_blank" rel="noopener">https://www.baidu.com/</a>），在Chrome浏览器中用F12调出开发者工具，选择Security标签页。<br><img src="http://halelu.github.io/2017/02/Public-Key-Infrastructure-2/pic-1.jpg" alt><br>点击View certificate，可以看到一张证书。<br><img src="http://halelu.github.io/2017/02/Public-Key-Infrastructure-2/pic-2.jpg" alt><br>这张证书是一张服务器证书，在详细信息中我们可以看到这张证书的基本信息。<br><img src="http://halelu.github.io/2017/02/Public-Key-Infrastructure-2/pic-3.jpg" alt>  </p>
+<p>所谓HTTPS，其实就是HTTP + SSL。<br>SSL的详细协议在下一篇讲，目前只需知道SSL所使用的数字证书就是这里的证书。而HTTPS就是用对方的公钥加密自己的通话，与对方协商出一个安全的对称密钥和加密方式，然后将双方通话过程全部用对称密钥加密（使用对称密钥是为了节省开销，每次都非对称加密会极大加重系统负担），由于协商过程是使用了公钥机制加密的，所以对称密钥也是安全的。</p>
+<h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>数字证书就是互联网通讯中标识通讯各方身份信息的一系列数据，提供了一种在Internet上验证身份的方式，其作用类似于驾驶执照或身份证。<br>数字证书通常由数字证书授权中心（Certificate Authority — CA）签发，带有CA的数字签名。其中包含公开密钥拥有者信息以及公开密钥的文件。<br>最简单的证书包含一个公开密钥、名称以及证书授权中心的数字签名。</p>
+<h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><p>其实说完最简单的证书，我们就可以知道数字证书最基本的功能是什么了。</p>
+<ul>
+<li>一个带有CA签名的证书，可以证明证书的主体是经过签发者认证的，安全的、可信任的（例如我们一开始看到的那张证书就是baidu.com经过了权威可信任的机构认证的凭证）</li>
+<li>由于公钥也被签在了证书内，所以只有掌握对应私钥的主体（也就是证书主体本人）才能解密你用公钥加密过的数据<ul>
+<li>即使其他任何人伪造了假的主体（例如修改DNS将<a href="http://www.baidu.com指向自己的服务器），但无法伪造带有CA签名的证书。换句话说，他可以伪造**http**://www.baidu.com，但无法伪造**https**://www.baidu.com" target="_blank" rel="noopener">www.baidu.com指向自己的服务器），但无法伪造带有CA签名的证书。换句话说，他可以伪造**http**://www.baidu.com，但无法伪造**https**://www.baidu.com</a></li>
+<li>即使伪装者强行将合法的证书（例如baidu.com的证书）拿来作为自己的证书搭出了HTTPS服务，那么当客户端用证书中的公钥加密自己的信息时，伪装者由于没有对应的私钥，他将无法解密信息</li>
+</ul>
+</li>
+</ul>
+<h3 id="格式"><a href="#格式" class="headerlink" title="格式"></a>格式</h3><p>目前的证书通常遵循 ITUT X.509国际标准，证书主要包括以下信息：</p>
+<ul>
+<li>版本号：用来区分X.509的不同版本</li>
+<li>序列号：每一个证书都有惟一的数字型编号</li>
+<li>认证机构标识：颁发该证书的机构惟一的X.500名字</li>
+<li>主体标识：证书持有者的名称</li>
+<li>主体公钥信息：和该主体私钥相对应的公钥</li>
+<li>证书有效期：证书开始有效期和证书失效期</li>
+<li>密钥/证书用法：描述该主体的公/私密钥对的合法用途</li>
+<li>扩展：说明该证书的附加信息</li>
+<li>认证机构签名：用认证机构的私钥生成的数字签名</li>
+</ul>
+<p><img src="http://halelu.github.io/2017/02/Public-Key-Infrastructure-2/pic-4.jpg" alt><br>认证机构签名是将主体部分hash后用认证机构私钥加密，如果能够被认证机构公钥解密就说明了证书内容没有被篡改。<br>验证方式如下图：<br><img src="http://halelu.github.io/2017/02/Public-Key-Infrastructure-2/pic-5.jpg" alt></p>
+<h2 id="数字证书的使用"><a href="#数字证书的使用" class="headerlink" title="数字证书的使用"></a>数字证书的使用</h2><h3 id="PKI的基本组件"><a href="#PKI的基本组件" class="headerlink" title="PKI的基本组件"></a>PKI的基本组件</h3><ul>
+<li>证书授权中心CA<ul>
+<li>证书签发机构，是PKI的核心，使PKI 应用中权威的、可信任的、公正的第三方机构。主要负责产生、分配并管理所有参与网上交易的实体所需的身份认证数字证书。</li>
+</ul>
+</li>
+<li>证书库<ul>
+<li>证书的集中存放地，提供公众查询。</li>
+</ul>
+</li>
+<li>密钥备份及恢复系统（optional）<ul>
+<li>对用户的解密密钥进行备份，当丢失时进行恢复，而签名密钥不用备份和恢复。</li>
+</ul>
+</li>
+<li>证书撤销处理系统<ul>
+<li>证书由于某种原因需要作废，终止使用，将通过证书撤销列表(CRL)来实现。</li>
+</ul>
+</li>
+<li>PKI应用接口系统<ul>
+<li>为各种各样的应用提供安全、一致、可信任的方式与PKI交互，确保所建立起来的网络环境安全可靠，并降低管理成本。</li>
+</ul>
+</li>
+</ul>
+<h3 id="PKI的基本原理"><a href="#PKI的基本原理" class="headerlink" title="PKI的基本原理"></a>PKI的基本原理</h3><p>首先，PKI有两条基本原则：</p>
+<ul>
+<li>有些安全性非常高、信誉非常好的CA是所有人都可以信任的，他们拥有签发下级CA的权利。他们的证书通常被内置在操作系统的可信任列表里。</li>
+<li>如果一个CA是可信任的且CA拥有签发下级证书的权利，那么他签发的证书也是可信任的。</li>
+</ul>
+<p>所以，通常我们看到的证书都是一条证书链。通常 <strong>根CA</strong> 不签发末端的客户证书，只负责签发 <strong>CA</strong> 证书，而 <strong>CA</strong> 根据他们证书中被授予的权限，有些可以签发下级CA有些只可以签发客户证书。<br>每张证书都会有过期时间和一个证书撤销列表（CRL）的URL。如果一张证书过期或被写进了CRL，那么证书就会作废（这往往是由私钥泄露导致的）。</p>
+
+      
+    </div>
+    
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/技术/" rel="tag">#技术</a>
+          
+            <a href="/tags/信息安全/" rel="tag">#信息安全</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/Public-Key-Infrastructure-1/" rel="next" title="公钥基础设施（一）：公钥机制">
+                <i class="fa fa-chevron-left"></i> 公钥基础设施（一）：公钥机制
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/Public-Key-Infrastructure-3/" rel="prev" title="公钥基础设施（三）：SSL协议">
+                公钥基础设施（三）：SSL协议 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/02/Public-Key-Infrastructure-2/" data-title="公钥基础设施（二）：数字证书" data-url="https://HaleLu.github.io/2017/02/Public-Key-Infrastructure-2/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="https://avatars3.githubusercontent.com/u/10864533" alt="Hale Lu">
+          <p class="site-author-name" itemprop="name">Hale Lu</p>
+          <p class="site-description motion-element" itemprop="description">一只欠觉的开发狗</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/halelu" target="_blank" title="Github">
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/hao-lu-42-29" target="_blank" title="知乎">
+                  
+                  知乎
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://wpa.qq.com/msgrd?v=3&uin=773622805&site=qq&menu=yes" target="_blank" title="QQ">
+                  
+                  QQ
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa fa-globe fa-fw"></i>
+              各路大神
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://pmextra.github.io/" title="PM Extra's Blog" target="_blank">PM Extra's Blog</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://hzlclock.wordpress.com/" title="Hebert's Blog" target="_blank">Hebert's Blog</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.rexskz.info/" title="Rex's Blog" target="_blank">Rex's Blog</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#认识数字证书"><span class="nav-number">1.</span> <span class="nav-text">认识数字证书</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#直观认识"><span class="nav-number">1.1.</span> <span class="nav-text">直观认识</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定义"><span class="nav-number">1.2.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#作用"><span class="nav-number">1.3.</span> <span class="nav-text">作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#格式"><span class="nav-number">1.4.</span> <span class="nav-text">格式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数字证书的使用"><span class="nav-number">2.</span> <span class="nav-text">数字证书的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PKI的基本组件"><span class="nav-number">2.1.</span> <span class="nav-text">PKI的基本组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PKI的基本原理"><span class="nav-number">2.2.</span> <span class="nav-text">PKI的基本原理</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hale Lu</span>
+</div>
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="http://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"halelu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      
+      <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+      <script src="/js/src/hook-duoshuo.js"></script>
+    
+  
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';                
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+                            
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').mousedown(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("ABk8fYaVcvf6P6IuuGNY2rRa-gzGzoHsz", "3Vpj3qkDsPj8Rlh92mHOxAMV");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>

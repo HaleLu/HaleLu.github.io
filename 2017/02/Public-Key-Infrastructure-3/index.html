@@ -1,0 +1,1060 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="技术,信息安全,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1">
+
+
+
+
+
+
+<meta name="description" content="本篇主要讲SSL协议的通信过程。">
+<meta name="keywords" content="技术,信息安全">
+<meta property="og:type" content="article">
+<meta property="og:title" content="公钥基础设施（三）：SSL协议">
+<meta property="og:url" content="https://HaleLu.github.io/2017/02/Public-Key-Infrastructure-3/index.html">
+<meta property="og:site_name" content="Move your idea forward.">
+<meta property="og:description" content="本篇主要讲SSL协议的通信过程。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://halelu.github.io/2017/02/Public-Key-Infrastructure-3/Pic-1.jpg">
+<meta property="og:image" content="http://halelu.github.io/2017/02/Public-Key-Infrastructure-3/Pic-2.jpg">
+<meta property="og:image" content="http://halelu.github.io/2017/02/Public-Key-Infrastructure-3/Pic-3.jpg">
+<meta property="og:updated_time" content="2019-06-28T05:38:32.260Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="公钥基础设施（三）：SSL协议">
+<meta name="twitter:description" content="本篇主要讲SSL协议的通信过程。">
+<meta name="twitter:image" content="http://halelu.github.io/2017/02/Public-Key-Infrastructure-3/Pic-1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6279916590628603000,
+      author: '（博主大人~）'
+    }
+  };
+</script>
+
+  <title> 公钥基础设施（三）：SSL协议 | Move your idea forward. </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-77199457-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Move your idea forward.</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Hale Lu's Blog</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                公钥基础设施（三）：SSL协议
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-02-12T13:15:40+08:00" content="2017-02-12">
+              2017-02-12
+            </time>
+          </span>
+
+          
+            <span class="post-category">
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/02/Public-Key-Infrastructure-3/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/Public-Key-Infrastructure-3/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/02/Public-Key-Infrastructure-3/" class="leancloud_visitors" data-flag-title="公钥基础设施（三）：SSL协议">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本篇主要讲SSL协议的通信过程。</p>
+<a id="more"></a>
+
+<h2 id="几个小问题"><a href="#几个小问题" class="headerlink" title="几个小问题"></a>几个小问题</h2><h3 id="SSL协议是干什么的？"><a href="#SSL协议是干什么的？" class="headerlink" title="SSL协议是干什么的？"></a>SSL协议是干什么的？</h3><p>首先，SSL是一种Web安全机制，他的作用是加密双方通信保证双方在不安全网络上的信息私密且不被篡改。</p>
+<h3 id="SSL是怎么加密通信的？"><a href="#SSL是怎么加密通信的？" class="headerlink" title="SSL是怎么加密通信的？"></a>SSL是怎么加密通信的？</h3><p>简单来说，双方先使用公钥体制互相验证身份并协商一个密钥，然后双方使用这个密钥作为之后通信的对称密钥来加密会话。<br>由于协商密钥是使用公钥体制进行的，所以密钥本身是不会被其他人截获的，所以保证了之后的通信过程加密的可靠性。<br>而之后的会话使用对称密钥是因为每次都使用非对称密钥则开销过大，使用对称密钥可以大大节省开销。</p>
+<h2 id="SSL协议详解"><a href="#SSL协议详解" class="headerlink" title="SSL协议详解"></a>SSL协议详解</h2><h3 id="体系结构"><a href="#体系结构" class="headerlink" title="体系结构"></a>体系结构</h3><p>有人说，SSL是在TCP和HTTP层之间的，也有人说，SSL层是和HTTP层并列在TCP层之上的。<br>我觉得应该是这样的：<br><img src="http://halelu.github.io/2017/02/Public-Key-Infrastructure-3/Pic-1.jpg" alt></p>
+<h4 id="SSL记录协议"><a href="#SSL记录协议" class="headerlink" title="SSL记录协议"></a>SSL记录协议</h4><p>记录协议将要发送的数据分块、压缩（可选）、加上消息认证代码（MAC）、加密、再加上一个SSL头，将最终的到的数据放入一个TCP段。<br>一个SSL记录的格式如下图所示：<br><img src="http://halelu.github.io/2017/02/Public-Key-Infrastructure-3/Pic-2.jpg" alt></p>
+<h4 id="SSL修改密码规范协议和警报协议"><a href="#SSL修改密码规范协议和警报协议" class="headerlink" title="SSL修改密码规范协议和警报协议"></a>SSL修改密码规范协议和警报协议</h4><p>这两个协议对我们开发来说关系不大。<br>修改密码规范协议仅一个字节，值为1，用于更新连接所使用的的密码套件。<br>警报协议两个字节，第一个字节表示等级，1表示警报（warning），2表示致命错误（error），第二个字节是警报信息的描述码，这里不详细列举。</p>
+<h4 id="SSL握手协议"><a href="#SSL握手协议" class="headerlink" title="SSL握手协议"></a>SSL握手协议</h4><p>这是SSL协议的重点，SSL的复杂性和安全性基本依赖于握手协议。</p>
+<p>握手协议一共分四个阶段：</p>
+<h5 id="第一阶段：建立安全功能"><a href="#第一阶段：建立安全功能" class="headerlink" title="第一阶段：建立安全功能"></a>第一阶段：建立安全功能</h5><p>第一阶段的主要任务是协商SSL版本、加密算法、压缩算法等。具体流程如下：<br><img src="http://halelu.github.io/2017/02/Public-Key-Infrastructure-3/Pic-3.jpg" alt></p>
+<p>客户端发出一个ClientHello，包括</p>
+<ul>
+<li>客户端可以支持的SSL最高版本号</li>
+<li>客户端生成的一个随机数</li>
+<li>会话ID</li>
+<li>客户端可以支持的密码套件列表</li>
+<li>客户端可以支持的压缩算法列表</li>
+</ul>
+<p>那么服务器返回一个ServerHello，包括</p>
+<ul>
+<li>确定使用的SSL版本号（取客户端和服务器支持的最高版本号的较小值）</li>
+<li>服务端生成的一个随机数</li>
+<li>会话ID</li>
+<li>服务端确定使用的密码套件</li>
+<li>服务端确定使用的压缩算法</li>
+</ul>
+<p>至此，客户端服务端已经协商确认了：</p>
+<ul>
+<li>SSL版本</li>
+<li>密钥交换、信息验证和加密算法</li>
+<li>压缩方法</li>
+<li>有关密钥生成的两个随机数</li>
+</ul>
+<h5 id="第二阶段：服务器认证和密钥交换"><a href="#第二阶段：服务器认证和密钥交换" class="headerlink" title="第二阶段：服务器认证和密钥交换"></a>第二阶段：服务器认证和密钥交换</h5><p>第二阶段双方之间做的事主要就是，服务器向客户端发送相关信息。<br>一般先后发送四条消息：</p>
+<ul>
+<li>证书链</li>
+<li>服务器密钥交换<ul>
+<li>此阶段非必须，以下情况下不需要此消息<ul>
+<li>服务器发送了带有固定Diffie-Hellman参数的证书</li>
+<li>使用RSA密钥交换</li>
+</ul>
+</li>
+<li>那么剩下的，以下情况需要此消息<ul>
+<li>匿名Diffie-Hellman：消息内容包括两个全局Diffie-Hellman值和服务器Diffie-Hellman公钥</li>
+<li>瞬时Diffie-Hellman：消息内容包括三个Diffie-Hellman参数，包括匿名Diffie-Hellman中的两个参数和它们的签名</li>
+<li>RSA密钥交换，服务器在使用RSA时仅使用了RSA签名密钥：因此，客户端不能简单地通过服务器公钥加密其密钥后传送，而服务器必须创建一个临时RSA公钥/私钥对，并使用服务器密钥交换信息发送公钥。消息内容包括两个临时的RSA公钥参数和参数签名。</li>
+<li>Fortezza</li>
+</ul>
+</li>
+<li>注：此时的签名并不是直接将请求hash后用私钥加密。为了防止重放攻击，还会将上一阶段客户端和服务器生成的两个随机数带上一起hash。</li>
+</ul>
+</li>
+<li>证书请求消息（服务器不使用匿名Diffie-Hellman）<ul>
+<li>包含两个参数：证书类型和签证机构<ul>
+<li>第一个参数证书类型表明了公钥算法和用途</li>
+<li>第二个参数签证机构是一张可接受的签证机构表</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>服务器完成消息（没有其他内容，仅表示消息结束）</li>
+</ul>
+<h5 id="第三阶段：客户端认证和密钥交换"><a href="#第三阶段：客户端认证和密钥交换" class="headerlink" title="第三阶段：客户端认证和密钥交换"></a>第三阶段：客户端认证和密钥交换</h5><p>第三阶段是客户端向服务器发送信息的阶段。在此之前，客户端会先检验服务端证书的有效性、参数是否可接受。<br>一般先后有三条消息：</p>
+<ul>
+<li>证书链（可选，如果服务器请求了证书，那么需要发送证书消息，如果没有证书需要发送“无证书警报”）</li>
+<li>客户端密钥交换消息<ul>
+<li>消息的内容依赖密钥交换的类型：<ul>
+<li><strong>RSA</strong>：客户端生成48字节的次密钥，并使用服务器证书中的公钥或服务器密钥交换消息中的临时RSA密钥加密。他被用于生成主密钥</li>
+<li><strong>瞬时或匿名Diffie-Hellman</strong>：发送的客户端Diffie-Hellman公钥参数</li>
+<li><strong>固定Diffie-Hellman</strong>：由于证书消息中包括Diffie-Hellman公钥参数，因此此消息内容为空</li>
+<li><strong>Fortezza</strong>：发送客户端的Fortezza参数</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>证书验证消息<ul>
+<li>固定Diffie-Hellman不发送这一消息</li>
+<li>客户端用私钥签名主密钥和握手信息，以防客户证书被盗用</li>
+</ul>
+</li>
+</ul>
+<h5 id="第四阶段：完成"><a href="#第四阶段：完成" class="headerlink" title="第四阶段：完成"></a>第四阶段：完成</h5><p>此阶段完成安全连接的设置。<br>过程如下：</p>
+<ul>
+<li>客户端使用修改密码规范协议发送一个修改密码规范消息（切换为对称加密）</li>
+<li>客户端使用新的加密算法和密钥发送一个完成消息，完成消息的内容是对握手消息的hash，确认密钥交换和认证过程的正确性</li>
+<li>服务端回应一个修改密码规范消息</li>
+<li>服务端使用新的加密算法和密钥发送一个完成消息</li>
+</ul>
+<p>至此，握手完成，客户端和服务器可以用对称加密交换信息了。<br>至于主密钥的计算由于和我们关系不大，我们只需要知道是用次密钥、服务器随机数、客户端随机数这三者生成的就可以了。有兴趣的小伙伴可以自行查阅相关书籍或资料。</p>
+
+      
+    </div>
+    
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/技术/" rel="tag">#技术</a>
+          
+            <a href="/tags/信息安全/" rel="tag">#信息安全</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/Public-Key-Infrastructure-2/" rel="next" title="公钥基础设施（二）：数字证书">
+                <i class="fa fa-chevron-left"></i> 公钥基础设施（二）：数字证书
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/Public-Key-Infrastructure-4/" rel="prev" title="公钥基础设施（四）：证书签发（以OpenSSL为例）">
+                公钥基础设施（四）：证书签发（以OpenSSL为例） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/02/Public-Key-Infrastructure-3/" data-title="公钥基础设施（三）：SSL协议" data-url="https://HaleLu.github.io/2017/02/Public-Key-Infrastructure-3/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="https://avatars3.githubusercontent.com/u/10864533" alt="Hale Lu">
+          <p class="site-author-name" itemprop="name">Hale Lu</p>
+          <p class="site-description motion-element" itemprop="description">一只欠觉的开发狗</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/halelu" target="_blank" title="Github">
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/hao-lu-42-29" target="_blank" title="知乎">
+                  
+                  知乎
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://wpa.qq.com/msgrd?v=3&uin=773622805&site=qq&menu=yes" target="_blank" title="QQ">
+                  
+                  QQ
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa fa-globe fa-fw"></i>
+              各路大神
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://pmextra.github.io/" title="PM Extra's Blog" target="_blank">PM Extra's Blog</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://hzlclock.wordpress.com/" title="Hebert's Blog" target="_blank">Hebert's Blog</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.rexskz.info/" title="Rex's Blog" target="_blank">Rex's Blog</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#几个小问题"><span class="nav-number">1.</span> <span class="nav-text">几个小问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SSL协议是干什么的？"><span class="nav-number">1.1.</span> <span class="nav-text">SSL协议是干什么的？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSL是怎么加密通信的？"><span class="nav-number">1.2.</span> <span class="nav-text">SSL是怎么加密通信的？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SSL协议详解"><span class="nav-number">2.</span> <span class="nav-text">SSL协议详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#体系结构"><span class="nav-number">2.1.</span> <span class="nav-text">体系结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#SSL记录协议"><span class="nav-number">2.1.1.</span> <span class="nav-text">SSL记录协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SSL修改密码规范协议和警报协议"><span class="nav-number">2.1.2.</span> <span class="nav-text">SSL修改密码规范协议和警报协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SSL握手协议"><span class="nav-number">2.1.3.</span> <span class="nav-text">SSL握手协议</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#第一阶段：建立安全功能"><span class="nav-number">2.1.3.1.</span> <span class="nav-text">第一阶段：建立安全功能</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#第二阶段：服务器认证和密钥交换"><span class="nav-number">2.1.3.2.</span> <span class="nav-text">第二阶段：服务器认证和密钥交换</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#第三阶段：客户端认证和密钥交换"><span class="nav-number">2.1.3.3.</span> <span class="nav-text">第三阶段：客户端认证和密钥交换</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#第四阶段：完成"><span class="nav-number">2.1.3.4.</span> <span class="nav-text">第四阶段：完成</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hale Lu</span>
+</div>
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="http://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"halelu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      
+      <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+      <script src="/js/src/hook-duoshuo.js"></script>
+    
+  
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';                
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+                            
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').mousedown(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("ABk8fYaVcvf6P6IuuGNY2rRa-gzGzoHsz", "3Vpj3qkDsPj8Rlh92mHOxAMV");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>

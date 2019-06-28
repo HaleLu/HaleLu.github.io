@@ -1,0 +1,1183 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content=".NET,swagger,生成文档,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1">
+
+
+
+
+
+
+<meta name="description" content="swagger 是什么？swagger 是一套框架，作用是自动化生成 .NET 的 Web API 项目的 API 文档。ASP.NET Core 官方提供了简单的 Swagger 使用文档：ASP.NET Web API Help Pages using Swagger">
+<meta name="keywords" content=".NET,swagger,生成文档">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一些实用的 .NET 开发工具（一）：swagger">
+<meta property="og:url" content="https://HaleLu.github.io/2017/03/DotNET-Tools-1/index.html">
+<meta property="og:site_name" content="Move your idea forward.">
+<meta property="og:description" content="swagger 是什么？swagger 是一套框架，作用是自动化生成 .NET 的 Web API 项目的 API 文档。ASP.NET Core 官方提供了简单的 Swagger 使用文档：ASP.NET Web API Help Pages using Swagger">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-06-28T05:38:32.148Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一些实用的 .NET 开发工具（一）：swagger">
+<meta name="twitter:description" content="swagger 是什么？swagger 是一套框架，作用是自动化生成 .NET 的 Web API 项目的 API 文档。ASP.NET Core 官方提供了简单的 Swagger 使用文档：ASP.NET Web API Help Pages using Swagger">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6279916590628603000,
+      author: '（博主大人~）'
+    }
+  };
+</script>
+
+  <title> 一些实用的 .NET 开发工具（一）：swagger | Move your idea forward. </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-77199457-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Move your idea forward.</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Hale Lu's Blog</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                一些实用的 .NET 开发工具（一）：swagger
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-03-11T14:25:34+08:00" content="2017-03-11">
+              2017-03-11
+            </time>
+          </span>
+
+          
+            <span class="post-category">
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/03/DotNET-Tools-1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/DotNET-Tools-1/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/03/DotNET-Tools-1/" class="leancloud_visitors" data-flag-title="一些实用的 .NET 开发工具（一）：swagger">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="swagger-是什么？"><a href="#swagger-是什么？" class="headerlink" title="swagger 是什么？"></a>swagger 是什么？</h1><p>swagger 是一套框架，作用是自动化生成 .NET 的 Web API 项目的 API 文档。<br>ASP.NET Core 官方提供了简单的 Swagger 使用文档：<a href="https://docs.microsoft.com/en-us/aspnet/core/tutorials/web-api-help-pages-using-swagger" target="_blank" rel="noopener">ASP.NET Web API Help Pages using Swagger</a></p>
+<a id="more"></a>
+
+<h1 id="Getting-Started"><a href="#Getting-Started" class="headerlink" title="Getting Started"></a>Getting Started</h1><ol>
+<li><p>首先我们要安装 Swashbuckle.AspNetCore 的 Nuget 包</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Install-Package Swashbuckle.AspNetCore -Pre</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>然后我们可以在 <em>Startup.cs</em> 中的 <em>ConfigureServices</em> 方法中注册 Swagger 文档生成器，这里可以定义一个或多个需要生成的文档</p>
+ <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">services.AddMvc();</span><br><span class="line"></span><br><span class="line">services.AddSwaggerGen(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">c.SwaggerDoc(<span class="string">"v1"</span>, <span class="keyword">new</span> Info &#123; Title = <span class="string">"My API"</span>, Version = <span class="string">"v1"</span> &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>我们需要确保所有的 API 方法和非路径的参数都有明确的 Http 和 From 绑定修饰符</p>
+ <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">HttpPost</span>]</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Create</span>(<span class="params">[FromBody]Product product</span>)</span></span><br><span class="line"><span class="function">...</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">[HttpGet]</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> IEnumerable&lt;Product&gt; <span class="title">Search</span>(<span class="params">[FromQuery]<span class="keyword">string</span> keywords</span>)</span></span><br><span class="line"><span class="function">...</span></span><br></pre></td></tr></table></figure>
+
+<p> <em>注: 省略参数绑定修饰符则默认为请求 (query) 字段</em></p>
+</li>
+<li><p>在 <em>Configure</em> 方法中添加中间件来暴露 Swagger 生成的文档 JSON</p>
+ <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">app.UseSwagger();</span><br></pre></td></tr></table></figure>
+
+<p> <em>此时你可以启动应用并在 “/swagger/v1/swagger.json.” 下看到 Swagger 生成的 JSON</em></p>
+</li>
+<li><p>（可选）如果你想得到交互式的文档，可以添加 swagger-ui 中间件。需要指定 Swagger JSON 源</p>
+ <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">app.UseSwaggerUI(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    c.SwaggerEndpoint(<span class="string">"/swagger/v1/swagger.json"</span>, <span class="string">"My API V1"</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p> <em>在 “/swagger” 下可以看到这个交互式的页面</em></p>
+</li>
+</ol>
+<h1 id="Swashbuckle-amp-ApiExplorer"><a href="#Swashbuckle-amp-ApiExplorer" class="headerlink" title="Swashbuckle &amp; ApiExplorer"></a>Swashbuckle &amp; ApiExplorer</h1><p>Swashbuckle 十分依赖 <em>ApiExplorer</em> 。<em>ApiExplorer</em> 是一项位于 ASP.NET Core 之上的 Metadata 层的服务。如果服务集使用的是 <em>AddMvc</em> 方法引导 MVC 栈的话那么会自动注册 <em>ApiExplorer_。然而如果是用 _AddMvcCore</em> 来自行引导 MVC stack 的话你需要手动添加 Api Explorer 服务:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">services.AddMvcCore()</span><br><span class="line">    .AddApiExplorer();</span><br></pre></td></tr></table></figure>
+
+<h1 id="组件"><a href="#组件" class="headerlink" title="组件"></a>组件</h1><p>Swashbuckle 包含三个包：Swagger 生成器, 暴露 JSON 格式 Swagger 文档的中间件和使用这个 JSON 暴露 swagger-ui 的中间件。 你可以通过 “Swashbuckle.AspNetCore” 包一起下载这些包或根据自己的需要独立下载。详细说明如下表所示</p>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Swashbuckle.AspNetCore.Swagger</strong></td>
+<td>用一个 JSON API 暴露 <em>SwaggerDocument</em> 对象。在返回一个序列化的 JSON 之前，这个包需要注册一个 <em>ISwaggerProvider</em> 的实现用于生成 Swagger 文档</td>
+</tr>
+<tr>
+<td><strong>Swashbuckle.AspNetCore.SwaggerGen</strong></td>
+<td>用于注入第一个组件需要的 <em>ISwaggerProvider</em> 的实现。这个特定的实现可以用你的路由（routes）、控制器（controllers）和模型（models）自动生成 Swagger 文档</td>
+</tr>
+<tr>
+<td><strong>Swashbuckle.AspNetCore.SwaggerUI</strong></td>
+<td>暴露一个嵌入版本的 swagger-ui。你可以指定 ui 从哪个 API 获取Swagger JSON，然后 ui 会使用 JSON 生成交互式文档</td>
+</tr>
+</tbody></table>
+<h1 id="配置-amp-自定义"><a href="#配置-amp-自定义" class="headerlink" title="配置 &amp; 自定义"></a>配置 &amp; 自定义</h1><!--
+* [Swashbuckle.AspNetCore.Swagger](#swashbuckleaspnetcoreswagger)
+
+    * [修改 Swagger JSON 路径](#修改-Swagger-JSON-路径)
+    * [使用 HTTP 请求信息修改 Swagger](#使用-HTTP-请求信息修改-Swagger)
+
+* [Swashbuckle.AspNetCore.SwaggerGen](#swashbuckleaspnetcoreswaggergen)
+
+    * [列举 HTTP responses](#列举-HTTP-responses)
+    * [Include Descriptions from XML Comments](#include-descriptions-from-xml-comments)
+    * [Provide Global API Metadata](#provide-global-api-metadata)
+    * [Generate Multiple Swagger Documents](#generate-multiple-swagger-documents)
+    * [Omit Obsolete Operations and/or Schema Properties](#omit-obsolete-operations-andor-schema-properties)
+    * [Omit Arbitrary Operations](#omit-arbitrary-operations)
+    * [Customize Operation Tags (e.g. for UI Grouping)](#customize-operation-tags-eg-for-ui-grouping)
+    * [Change Operation Sort Order (e.g. for UI Sorting)](#change-operation-sort-order-eg-for-ui-sorting)
+    * [Customize Schema Id's](#customize-schema-ids)
+    * [Customize Schema for Enum Types](#customize-schema-for-enum-types)
+    * [Override Schema for Specific Types](#override-schema-for-specific-types)
+    * [Extend Generator with Operation, Schema & Document Filters](#extend-generator-with-operation-schema--document-filters)
+    * [Add Security Definitions and Requirements](#add-security-definitions-and-requirements)
+
+* [Swashbuckle.AspNetCore.SwaggerUI](#swashbuckleaspnetcoreswaggerui)
+    * [Change Releative Path to the UI](#change-relative-path-to-the-ui)
+    * [List Multiple Swagger Documents](#list-multiple-swagger-documents)
+    * [Apply swagger-ui Parameters](#apply-swagger-ui-parameters)
+    * [Inject Custom CSS](#inject-custom-css)
+    * [Enable OAuth2.0 Flows](#enable-oauth20-flows)
+-->
+
+<h2 id="Swashbuckle-AspNetCore-Swagger"><a href="#Swashbuckle-AspNetCore-Swagger" class="headerlink" title="Swashbuckle.AspNetCore.Swagger"></a>Swashbuckle.AspNetCore.Swagger</h2><h3 id="修改-Swagger-JSON-路径"><a href="#修改-Swagger-JSON-路径" class="headerlink" title="修改 Swagger JSON 路径"></a>修改 Swagger JSON 路径</h3><p>Swagger JSON 默认暴露在 <code>/swagger/{documentName}/swagger.json</code> 路径下。在启用中间件时我们可以自行修改这个路径。自定义的路径<strong>必须</strong>包含 <code>{documentName}</code> 字段。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">app.UseSwagger(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    c.RouteTemplate = <span class="string">"api-docs/&#123;documentName&#125;/swagger.json"</span>;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><em>NOTE: 如果同时也使用了 SwaggerUI 中间件，那么我们还需要更新 Swagger UI 的配置：</em></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">app.UseSwaggerUI(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    c.SwaggerEndpoint(<span class="string">"/api-docs/v1/swagger.json"</span>, <span class="string">"My API V1"</span>);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-HTTP-请求信息修改-Swagger"><a href="#使用-HTTP-请求信息修改-Swagger" class="headerlink" title="使用 HTTP 请求信息修改 Swagger"></a>使用 HTTP 请求信息修改 Swagger</h3><p>如果我们想使用当前请求的某些信息设置 Swagger metadata，那么可以注册一个过滤器。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">app.UseSwagger(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    c.PreSerializeFilters.Add((swaggerDoc, httpReq) =&gt; swaggerDoc.Host = httpReq.Host.Value);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><em>SwaggerDocument</em> 和当前的 <em>HttpRequest</em> 都会被传递至过滤器。这个方法提供了很大的灵活性。例如你可以赋值给 <code>host</code> 属性（如上所示），你也可以检查 session 信息或者是 Authoriation header 来验证用户权限。 </p>
+<h2 id="Swashbuckle-AspNetCore-SwaggerGen"><a href="#Swashbuckle-AspNetCore-SwaggerGen" class="headerlink" title="Swashbuckle.AspNetCore.SwaggerGen"></a>Swashbuckle.AspNetCore.SwaggerGen</h2><h3 id="列举-HTTP-responses"><a href="#列举-HTTP-responses" class="headerlink" title="列举 HTTP responses"></a>列举 HTTP responses</h3><p>Swashbuckle 默认会为所有方法生成 <code>200</code> responses。如果这个方法返回一个 DTO，那么这个 DTO 将会被用来生成 HTTP responses body 的 schema，例如：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">HttpPost(<span class="meta-string">"&#123;id&#125;"</span>)</span>]</span><br><span class="line"><span class="function"><span class="keyword">public</span> Product <span class="title">GetById</span>(<span class="params"><span class="keyword">int</span> id</span>)</span></span><br></pre></td></tr></table></figure>
+
+<p>Will produce the following response metadata:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">responses: &#123;</span><br><span class="line">  200: &#123;</span><br><span class="line">    description: &quot;Success&quot;,</span><br><span class="line">    schema: &#123;</span><br><span class="line">      $ref: &quot;#/definitions/Product&quot;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="指定-HTTP-responses"><a href="#指定-HTTP-responses" class="headerlink" title="指定 HTTP responses"></a>指定 HTTP responses</h4><p>如果你想要指定一个状态码和/或其他 responses，或者需要返回的不是 DTO 而是 <em>IActionResult_，你可以用 ASP.NET Core 中的 _ProducesResponseTypeAttribute</em> 描述特定的 response，例如：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">HttpPost(<span class="meta-string">"&#123;id&#125;"</span>)</span>]</span><br><span class="line">[<span class="meta">ProducesResponseType(typeof(Product), 200)</span>]</span><br><span class="line">[<span class="meta">ProducesResponseType(typeof(IDictionary&lt;string, string&gt;), 400)</span>]</span><br><span class="line">[<span class="meta">ProducesResponseType(typeof(void), 500)</span>]</span><br><span class="line"><span class="function"><span class="keyword">public</span> IActionResult <span class="title">GetById</span>(<span class="params"><span class="keyword">int</span> id</span>)</span></span><br></pre></td></tr></table></figure>
+
+<p>这种写法会得到的 response metadata:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">responses: &#123;</span><br><span class="line">  200: &#123;</span><br><span class="line">    description: &quot;Success&quot;,</span><br><span class="line">    schema: &#123;</span><br><span class="line">      $ref: &quot;#/definitions/Product&quot;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  400: &#123;</span><br><span class="line">    description: &quot;Bad Request&quot;,</span><br><span class="line">    schema: &#123;</span><br><span class="line">      type: &quot;object&quot;,</span><br><span class="line">      additionalProperties: &#123;</span><br><span class="line">        type: &quot;string&quot;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  500: &#123;</span><br><span class="line">    description: &quot;Server Error&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用-XML-注释生成描述"><a href="#使用-XML-注释生成描述" class="headerlink" title="使用 XML 注释生成描述"></a>使用 XML 注释生成描述</h3><p>为了增强可读性，控制器和模型可以添加 <a href="http://msdn.microsoft.com/zh-cn/library/b2s063f7(v=vs.110).aspx" target="_blank" rel="noopener">XML 文档注释</a>，并在注册 Swashbuckle 时将这些注释包含进 Swagger JSON:</p>
+<ol>
+<li><p>打开项目的“属性”选项，选择“生成”标签页并勾上“ XML 文档文件”。然后当你生成项目时可以它会自动生成一个包含所有 XML 注释的文件。</p>
+<p> <em>此时如果某个类或方法没有使用 XML 注释，那么会产生一个生成警告。如果想要去掉这个警告,在此页的“禁止显示警告”选项中添加警告码“1591”即可。</em></p>
+</li>
+<li><p>在注册 Swashbuckle 时引用 XML 注释文件来生成 Swagger JSON:</p>
+ <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">services.AddSwaggerGen(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    c.SwaggerDoc(<span class="string">"v1"</span>,</span><br><span class="line">        <span class="keyword">new</span> Info</span><br><span class="line">        &#123;</span><br><span class="line">            Title = <span class="string">"My API - V1"</span>,</span><br><span class="line">            Version = <span class="string">"v1"</span></span><br><span class="line">        &#125;</span><br><span class="line">     );</span><br><span class="line"></span><br><span class="line">     <span class="keyword">var</span> filePath = Path.Combine(PlatformServices.Default.Application.ApplicationBasePath, <span class="string">"MyApi.xml"</span>);</span><br><span class="line">     c.IncludeXmlComments(filePath);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>方法注释应当有 summary、 remarks 和 response 标签。</p>
+ <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Retrieves a specific product by unique id</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;remarks&gt;</span>Awesomeness!<span class="doctag">&lt;/remarks&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;response code="200"&gt;</span>Product created<span class="doctag">&lt;/response&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;response code="400"&gt;</span>Product has missing/invalid values<span class="doctag">&lt;/response&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;response code="500"&gt;</span>Oops! Can't create your product right now<span class="doctag">&lt;/response&gt;</span></span></span><br><span class="line">[<span class="meta">HttpGet(<span class="meta-string">"&#123;id&#125;"</span>)</span>]</span><br><span class="line">[<span class="meta">ProducesResponseType(typeof(Product), 200)</span>]</span><br><span class="line">[<span class="meta">ProducesResponseType(typeof(IDictionary&lt;string, string&gt;), 400)</span>]</span><br><span class="line">[<span class="meta">ProducesResponseType(typeof(void), 500)</span>]</span><br><span class="line"><span class="function"><span class="keyword">public</span> Product <span class="title">GetById</span>(<span class="params"><span class="keyword">int</span> id</span>)</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>重新生成项目，XML 注释文件会被更新。你可以打开 Swagger JSON 页面看看这些注释是怎么映射进对应的 Swagger 文档的。</p>
+</li>
+</ol>
+<p><em>注：你也可以通过给 model 以及它们的属性添加 summary 标签的方式生成 Swagger 文档。如果你有多个 XML 注释文件（例如控制器和 model 是独立的类库），你可以多次调用 IncludeXmlComments 方法，他们会被合并进输出的 Swagger JSON.</em></p>
+<h3 id="提供全局-API-Metadata"><a href="#提供全局-API-Metadata" class="headerlink" title="提供全局 API Metadata"></a>提供全局 API Metadata</h3><p>除了 <em>Paths_， _Operations</em> 和 _Responses_，Swashbuckle 还提供了全局 metadata (详见 <a href="http://swagger.io/specification/#swaggerObject)。例如，你可以为你的" target="_blank" rel="noopener">http://swagger.io/specification/#swaggerObject)。例如，你可以为你的</a> API、服务项、甚至是联系方式和证书信息提供一个完整的描述：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">c.SwaggerDoc(<span class="string">"v1"</span>,</span><br><span class="line">    <span class="keyword">new</span> Info</span><br><span class="line">    &#123;</span><br><span class="line">        Title = <span class="string">"My API - V1"</span>,</span><br><span class="line">        Version = <span class="string">"v1"</span>,</span><br><span class="line">        Description = <span class="string">"A sample API to demo Swashbuckle"</span>,</span><br><span class="line">        TermsOfService = <span class="string">"Knock yourself out"</span>,</span><br><span class="line">        Contact = <span class="keyword">new</span> Contact</span><br><span class="line">        &#123;</span><br><span class="line">            Name = <span class="string">"Joe Developer"</span>,</span><br><span class="line">            Email = <span class="string">"joe.developer@tempuri.org"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        License = <span class="keyword">new</span> License</span><br><span class="line">        &#123;</span><br><span class="line">            Name = <span class="string">"Apache 2.0"</span>,</span><br><span class="line">            Url = <span class="string">"http://www.apache.org/licenses/LICENSE-2.0.html"</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p><em>使用 IntelliSense 可以看到哪些字段是可用的。</em></p>
+<p>未完待更。</p>
+<!--
+### 生成多个 Swagger 文档 ###
+
+With the setup described above, the generator will include all API operations in a single Swagger document. However, you can create multiple documents if necessary. For example, you may want a separate document for each version of your API. To do this, start by defining multiple Swagger docs in _Startup.cs_:
+
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">services.AddSwaggerGen(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    c.SwaggerDoc(<span class="string">"v1"</span>, <span class="keyword">new</span> Info &#123; Title = <span class="string">"My API - V1"</span>, Version = <span class="string">"v1"</span> &#125;);</span><br><span class="line">    c.SwaggerDoc(<span class="string">"v2"</span>, <span class="keyword">new</span> Info &#123; Title = <span class="string">"My API - V2"</span>, Version = <span class="string">"v2"</span> &#125;);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><em>Take note of the first argument to SwaggerDoc. It MUST be a URI-friendly name that uniquely identifies the document. It’s subsequently used to make up the path for requesting the corresponding Swagger JSON. For example, with the default routing, the above documents will be available at “/swagger/v1/swagger.json” and “/swagger/v2/swagger.json”.</em></p>
+<p>Next, you’ll need to inform Swashbuckle which actions to include in each document. Although this can be customized (see below), by default, the generator will use the <em>ApiDescription.GroupName</em> property, part of the built-in metadata layer that ships with ASP.NET Core, to make this distinction. You can set this by decorating individual actions OR by applying an application wide convention.</p>
+<h4 id="通过修饰符指定"><a href="#通过修饰符指定" class="headerlink" title="通过修饰符指定"></a>通过修饰符指定</h4><p>To include an action in a specific Swagger document, decorate it with the <em>ApiExplorerSettingsAttribute</em> and set <em>GroupName</em> to the corresponding document name (case sensitive):</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">HttpPost</span>]</span><br><span class="line">[<span class="meta">ApiExplorerSettings(GroupName = <span class="meta-string">"v2"</span>)</span>]</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Post</span>(<span class="params">[FromBody]Product product</span>)</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="通过-Convention-指定"><a href="#通过-Convention-指定" class="headerlink" title="通过 Convention 指定"></a>通过 Convention 指定</h4><p>To group by convention instead of decorating every action, you can apply a custom controller or action convention. For example, you could wire up the following convention to assign actions to documents based on the controller namespace.</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ApiExplorerGroupPerVersionConvention.cs</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ApiExplorerGroupPerVersionConvention</span> : <span class="title">IControllerModelConvention</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Apply</span>(<span class="params">ControllerModel controller</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">var</span> controllerNamespace = controller.ControllerType.Namespace; <span class="comment">// e.g. "Controllers.V1"</span></span><br><span class="line">        <span class="keyword">var</span> apiVersion = controllerNamespace.Split(<span class="string">'.'</span>).Last().ToLower();</span><br><span class="line"></span><br><span class="line">        controller.ApiExplorer.GroupName = apiVersion;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Startup.cs</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ConfigureServices</span>(<span class="params">IServiceCollection services</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    services.AddMvc(c =&gt;</span><br><span class="line">        c.Conventions.Add(<span class="keyword">new</span> ApiExplorerGroupPerVersionConvention())</span><br><span class="line">    );</span><br><span class="line">    </span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="自定义选择方式"><a href="#自定义选择方式" class="headerlink" title="自定义选择方式"></a>自定义选择方式</h4><p>When selecting actions for a given Swagger document, the generator invokes a <em>DocInclusionPredicate</em> against every <em>ApiDescription</em> that’s surfaced by the framework. The default implementation inspects <em>ApiDescription.GroupName</em> and returns true if the value is either null OR equal to the requested document name. However, you can also provide a custom inclusion predicate. For example, if you’re using an attribute-based approach to implement API versioning (e.g. Microsoft.AspNetCore.Mvc.Versioning), you could configure a custom predicate that leverages this instead:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">c.DocInclusionPredicate((docName, apiDesc) =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">var</span> versions = apiDesc.ControllerAttributes()</span><br><span class="line">        .OfType&lt;ApiVersionAttribute&gt;()</span><br><span class="line">        .SelectMany(attr =&gt; attr.Versions);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> versions.Any(v =&gt; <span class="string">$"v<span class="subst">&#123;v.ToString()&#125;</span>"</span> == docName);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="通过-UI-显示多个文档"><a href="#通过-UI-显示多个文档" class="headerlink" title="通过 UI 显示多个文档"></a>通过 UI 显示多个文档</h4><p>If you’re using the <em>SwaggerUI</em> middleware, you’ll need to specify any additional Swagger endpoints you want to expose. See <a href="#list-multiple-swagger-documents">List Multiple Swagger Documents</a> for more.</p>
+<h3 id="忽略废弃操作和-或-Schema-属性"><a href="#忽略废弃操作和-或-Schema-属性" class="headerlink" title="忽略废弃操作和/或 Schema 属性"></a>忽略废弃操作和/或 Schema 属性</h3><p>The <a href="http://swagger.io/specification/">Swagger spec</a> includes a “deprecated” flag for indicating that an operation is deprecated and should be refrained from use. The Swagger generator will automatically set this flag if the corresponding action is decorated with the <em>ObsoleteAttribute</em>. However, instead of setting a flag, you can configure the generator to ignore obsolete actions altogether:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">services.AddSwaggerGen(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    c.IgnoreObsoleteActions();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>A similar approach can also be used to omit obsolete properties from Schema’s in the Swagger output. That is, you can decorate model properties with the <em>ObsoleteAttribute</em> and configure Swashbuckle to omit those properties when generating JSON Schemas:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">services.AddSwaggerGen(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    c.IgnoreObsoleteProperties();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="忽略某一方法"><a href="#忽略某一方法" class="headerlink" title="忽略某一方法"></a>忽略某一方法</h3><p>You can omit operations from the Swagger output by decorating individual actions OR by applying an application wide convention.</p>
+<h4 id="通过修饰符指定-1"><a href="#通过修饰符指定-1" class="headerlink" title="通过修饰符指定"></a>通过修饰符指定</h4><p>To omit a specific action, decorate it with the <em>ApiExplorerSettingsAttribute</em> and set the <em>IgnoreApi</em> flag:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">HttpGet(<span class="meta-string">"&#123;id&#125;"</span>)</span>]</span><br><span class="line">[<span class="meta">ApiExplorerSettings(IgnoreApi = true)</span>]</span><br><span class="line"><span class="function"><span class="keyword">public</span> Product <span class="title">GetById</span>(<span class="params"><span class="keyword">int</span> id</span>)</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="通过-Convention-指定-1"><a href="#通过-Convention-指定-1" class="headerlink" title="通过 Convention 指定"></a>通过 Convention 指定</h4><p>To omit actions by convention instead of decorating them individually, you can apply a custom action convention. For example, you could wire up the following convention to only document GET operations:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ApiExplorerGetsOnlyConvention.cs</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ApiExplorerGetsOnlyConvention</span> : <span class="title">IActionModelConvention</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Apply</span>(<span class="params">ActionModel action</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        action.ApiExplorer.IsVisible = action.Attributes.OfType&lt;HttpGetAttribute&gt;().Any();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Startup.cs</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ConfigureServices</span>(<span class="params">IServiceCollection services</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    services.AddMvc(c =&gt;</span><br><span class="line">        c.Conventions.Add(<span class="keyword">new</span> ApiExplorerGetsOnlyConvention())</span><br><span class="line">    );</span><br><span class="line">    </span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="自定义方法标签（当-UI-需要以此分组时）"><a href="#自定义方法标签（当-UI-需要以此分组时）" class="headerlink" title="自定义方法标签（当 UI 需要以此分组时）"></a>自定义方法标签（当 UI 需要以此分组时）</h3><p>The <a href="http://swagger.io/specification/">Swagger spec</a> allows one or more “tags” to be assigned to an operation. The Swagger generator will assign the controller name as the default tag. This is particularly interesting if you’re using the <em>SwaggerUI</em> middleware as it uses this value to group operations.</p>
+<p>You can override the default tag by providing a function that applies tags by convention. For example, the following configuration will tag, and therefore group operations in the UI, by HTTP method:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">services.AddSwaggerGen(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    c.TagActionsBy(api =&gt; api.HttpMethod);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="改变方法顺序-当-UI-需要以此排序时"><a href="#改变方法顺序-当-UI-需要以此排序时" class="headerlink" title="改变方法顺序 (当 UI 需要以此排序时)"></a>改变方法顺序 (当 UI 需要以此排序时)</h3><p>By default, actions are ordered by assigned tag (see above) before they’re grouped into the path-based, hierarchichal structure imposed by the <a href="http://swagger.io/specification">Swagger spec</a>. You can change this behavior with a custom sorting strategy:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">services.AddSwaggerGen(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    c.OrderActionsBy((apiDesc) =&gt; <span class="string">$"<span class="subst">&#123;apiDesc.ControllerName()&#125;</span>_<span class="subst">&#123;apiDesc.HttpMethod&#125;</span>"</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><em>NOTE: This dictates the sort order BEFORE actions are grouped and transformed into the Swagger format. So, it affects the ordering of groups (i.e. Swagger PathItems), AND the ordering of operations within a group, in the Swagger output.</em></p>
+<h3 id="自定义-Schema-Id’s"><a href="#自定义-Schema-Id’s" class="headerlink" title="自定义 Schema Id’s"></a>自定义 Schema Id’s</h3><p>If the generator encounters complex parameter or response types, it will generate a corresponding JSON Schema, add it to the global “definitions” dictionary, and reference it from the operation description by unique Id. For example, if you have an action that returns a “Product” type, the generated schema will be referenced as follows:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">responses: &#123;</span><br><span class="line">  200: &#123;</span><br><span class="line">    description: &quot;Success&quot;,</span><br><span class="line">    schema: &#123;</span><br><span class="line">      $ref: &quot;#/definitions/Product&quot;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>However, if it encounters multiple “Product” classes under different namespaces (e.g. “RequestModels.Product” &amp; “ResponseModels.Product”), then Swashbuckle will raise an exception due to “Conflicting schemaIds”. In this case, you’ll need to provide a custom Id strategy that further qualifies the name:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">services.AddSwaggerGen(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    c.CustomSchemaIds((type) =&gt; type.FullName);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="自定义枚举类型-Schema"><a href="#自定义枚举类型-Schema" class="headerlink" title="自定义枚举类型 Schema"></a>自定义枚举类型 Schema</h3><p>When describing parameters and responses, Swashbuckle does its best to reflect the application’s serialization settings. For example, if the <em>CamelCaseContractResolver</em> is enabled, Schema property names will be camelCased in the generated Swagger.</p>
+<p>Similarly for enum types, if the <em>StringEnumConverter</em> is enabled, then the corresponding Schema’s will list enum names rather than integer values.</p>
+<p>For most cases this should be sufficient. However, if you need more control, Swashbuckle exposes the following options to override the default behavior:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">services.AddSwaggerGen(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    c.DescribeAllEnumsAsStrings();</span><br><span class="line">    c.DescribeStringEnumsInCamelCase();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="为指定类型重写-Schema"><a href="#为指定类型重写-Schema" class="headerlink" title="为指定类型重写 Schema"></a>为指定类型重写 Schema</h3><p>Out-of-the-box, Swashbuckle does a decent job at generating JSON Schema’s that accurately describe your request and response payloads. However, if you’re customizing serialization behavior for certain types in your API, you may need to help it out.</p>
+<p>For example, you might have a class with muliple properties that you want to represent in JSON as a comma-separated string. To do this you would probably implement a custom <em>JsonConverter</em>. In this case, Swashbuckle doesn’t know how the converter is implemented and so you would need to provide it with a Schema that accurately describes the type:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PhoneNumber.cs</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PhoneNumber</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> CountryCode &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> AreaCode &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> SubscriberId &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Startup.cs</span></span><br><span class="line">services.AddSwaggerGen(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    c.MapType&lt;PhoneNumber&gt;(() =&gt; <span class="keyword">new</span> Schema &#123; Type = <span class="string">"string"</span> &#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Extend-Generator-with-Operation-Schema-amp-Document-Filters"><a href="#Extend-Generator-with-Operation-Schema-amp-Document-Filters" class="headerlink" title="Extend Generator with Operation, Schema &amp; Document Filters"></a>Extend Generator with Operation, Schema &amp; Document Filters</h3><p>Swashbuckle exposes a filter pipeline that hooks into the generation process. Once generated, individual metadata objects are passed into the pipeline where they can be modified further. You can wire up one or more custom filters for <em>Operation</em>, <em>Schema</em> and <em>Document</em> objects:</p>
+<h4 id="Operation-Filters"><a href="#Operation-Filters" class="headerlink" title="Operation Filters"></a>Operation Filters</h4><p>Swashbuckle retrieves an <em>ApiDescription</em>, part of ASP.NET Core, for every action and uses it to generate a corresponding <em>Swagger Operation</em>. Once generated, it passes the <em>Operation</em> and the <em>ApiDescription</em> through the list of configured Operation Filters.</p>
+<p>In a typical filter implementation, you inspect the <em>ApiDescription</em> for relevant information (e.g. route info, action attributes etc.) and then update the Swagger <em>Operation</em> accordingly. For example, the following filter lists an additional “401” response for all actions that are decorated with the <em>AuthorizeAttribute</em>:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// AuthResponsesOperationFilter.cs</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AuthResponsesOperationFilter</span> : <span class="title">IOperationFilter</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Apply</span>(<span class="params">Operation operation, OperationFilterContext context</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">var</span> authAttributes = context.ApiDescription</span><br><span class="line">            .ControllerAttributes()</span><br><span class="line">            .Union(context.ApiDescription.ActionAttributes())</span><br><span class="line">            .OfType&lt;AuthorizeAttribute&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (authAttributes.Any())</span><br><span class="line">            operation.Responses.Add(<span class="string">"401"</span>, <span class="keyword">new</span> Response &#123; Description = <span class="string">"Unauthorized"</span> &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Startup.cs</span></span><br><span class="line">services.AddSwaggerGen(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    c.OperationFilter&lt;AuthResponsesOperationFilter&gt;();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><em>NOTE: Filter pipelines are DI-aware. That is, you can create filters with constructor parameters and if the parameter types are registered with the DI framework, they’ll be automatically injected when the filters are instantiated</em></p>
+<h4 id="Schema-Filters"><a href="#Schema-Filters" class="headerlink" title="Schema Filters"></a>Schema Filters</h4><p>Swashbuckle generates a Swagger-flavored <em><a href="http://swagger.io/specification/#schemaObject">JSONSchema</a></em> for every parameter, response and property type that’s exposed by your controller actions. Once generated, it passes the <em>Schema</em> and <em>Type</em> through the list of configured Schema Filters.</p>
+<p>The example below adds an AutoRest vendor extension (see <a href="https://github.com/Azure/autorest/blob/master/docs/extensions/readme.md#x-ms-enum">https://github.com/Azure/autorest/blob/master/docs/extensions/readme.md#x-ms-enum</a>) to inform the AutoRest tool how enums should be modelled when it generates the API client.</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// AutoRestSchemaFilter.cs</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AutoRestSchemaFilter</span> : <span class="title">ISchemaFilter</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Apply</span>(<span class="params">Schema schema, SchemaFilterContext context</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">var</span> typeInfo = context.SystemType.GetTypeInfo();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (typeInfo.IsEnum)</span><br><span class="line">        &#123;</span><br><span class="line">            schema.Extensions.Add(</span><br><span class="line">                <span class="string">"x-ms-enum"</span>,</span><br><span class="line">                <span class="keyword">new</span> &#123; name = typeInfo.Name,  modelAsString = <span class="literal">true</span> &#125;</span><br><span class="line">            );</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Startup.cs</span></span><br><span class="line">services.AddSwaggerGen(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    c.SchemaFilter&lt;AutoRestSchemaFilter&gt;();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Document-Filters"><a href="#Document-Filters" class="headerlink" title="Document Filters"></a>Document Filters</h4><p>Once a <em>Swagger Document</em> has been generated, it too can be passed through a set of pre-configured <em>Document</em> Filters. This gives full control to modify the document however you see fit. To ensure you’re still returning valid Swagger JSON, you should have a read through the <a href="http://swagger.io/specification/">specification</a> before using this filter type.</p>
+<p>The example below provides a description for any tags that are assigned to operations in the document:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">TagDescriptionsDocumentFilter</span> : <span class="title">IDocumentFilter</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Apply</span>(<span class="params">SwaggerDocument swaggerDoc, DocumentFilterContext context</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        swaggerDoc.Tags = <span class="keyword">new</span>[] &#123;</span><br><span class="line">            <span class="keyword">new</span> Tag &#123; Name = <span class="string">"Products"</span>, Description = <span class="string">"Browse/manage the product catalog"</span> &#125;,</span><br><span class="line">            <span class="keyword">new</span> Tag &#123; Name = <span class="string">"Orders"</span>, Description = <span class="string">"Submit orders"</span> &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><em>NOTE: If you’re using the SwaggerUI middleware, this filter can be used to display additional descriptions beside each group of Operations.</em></p>
+<h3 id="Add-Security-Definitions-and-Requirements"><a href="#Add-Security-Definitions-and-Requirements" class="headerlink" title="Add Security Definitions and Requirements"></a>Add Security Definitions and Requirements</h3><p>In Swagger, you can describe how your API is secured by defining one or more <em>Security Scheme’s</em> (e.g basic, api key, oauth etc.) and declaring which of those schemes are applicable globally OR for specific operations. For more details, take a look at the “securityDefinitions” and “security” fields in the <a href="http://swagger.io/specification/#swaggerObject">Swagger spec</a>.</p>
+<p>You can use some of the options described above to include security metadata in the generated <em>Swagger Document</em>. The example below adds an <a href="https://oauth.net/2/">OAuth 2.0</a> definition to the global metadata and a corresponding <em>Operation Filter</em> that uses the presence of an <em>AuthorizeAttribute</em> to determine which operations the scheme applies to.</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Startup.cs</span></span><br><span class="line">services.AddSwaggerGen(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// Define the OAuth2.0 scheme that's in use (i.e. Implicit Flow)</span></span><br><span class="line">    c.AddSecurityDefinition(<span class="string">"oauth2"</span>, <span class="keyword">new</span> OAuth2Scheme</span><br><span class="line">    &#123;</span><br><span class="line">        Type = <span class="string">"oauth2"</span>,</span><br><span class="line">        Flow = <span class="string">"implicit"</span>,</span><br><span class="line">        AuthorizationUrl = <span class="string">"http://petstore.swagger.io/oauth/dialog"</span></span><br><span class="line">        Scopes = <span class="keyword">new</span> Dictionary&lt;<span class="keyword">string</span>, <span class="keyword">string</span>&gt;</span><br><span class="line">        &#123;</span><br><span class="line">            &#123; <span class="string">"readAccess"</span>, <span class="string">"Access read operations"</span> &#125;,</span><br><span class="line">            &#123; <span class="string">"writeAccess"</span>, <span class="string">"Access write operations"</span> &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="comment">// Assign scope requirements to operations based on AuthorizeAttribute</span></span><br><span class="line">    c.OperationFilter&lt;SecurityRequirementsOperationFilter&gt;();</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// SecurityRequirementsOperationFilter.cs</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SecurityRequirementsOperationFilter</span> : <span class="title">IOperationFilter</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Apply</span>(<span class="params">Operation operation, OperationFilterContext context</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Policy names map to scopes</span></span><br><span class="line">        <span class="keyword">var</span> controllerScopes = context.ApiDescription.ControllerAttributes()</span><br><span class="line">            .OfType&lt;AuthorizeAttribute&gt;()</span><br><span class="line">            .Select(attr =&gt; attr.Policy);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> actionScopes = context.ApiDescription.ActionAttributes()</span><br><span class="line">            .OfType&lt;AuthorizeAttribute&gt;()</span><br><span class="line">            .Select(attr =&gt; attr.Policy);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> requiredScopes = controllerScopes.Union(actionScopes).Distinct();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (requiredScopes.Any())</span><br><span class="line">        &#123;</span><br><span class="line">            operation.Responses.Add(<span class="string">"401"</span>, <span class="keyword">new</span> Response &#123; Description = <span class="string">"Unauthorized"</span> &#125;);</span><br><span class="line">            operation.Responses.Add(<span class="string">"403"</span>, <span class="keyword">new</span> Response &#123; Description = <span class="string">"Forbidden"</span> &#125;);</span><br><span class="line"></span><br><span class="line">            operation.Security = <span class="keyword">new</span> List&lt;IDictionary&lt;<span class="keyword">string</span>, IEnumerable&lt;<span class="keyword">string</span>&gt;&gt;&gt;();</span><br><span class="line">            operation.Security.Add(<span class="keyword">new</span> Dictionary&lt;<span class="keyword">string</span>, IEnumerable&lt;<span class="keyword">string</span>&gt;&gt;</span><br><span class="line">            &#123;</span><br><span class="line">                &#123; <span class="string">"oauth2"</span>, requiredScopes &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><em>NOTE: If you’re using the SwaggerUI middleware, you can enable interactive OAuth2.0 flows that are powered by the emitted security metadata. See <a href="#">Enabling OAuth2.0 Flows</a> for more details.</em></p>
+<h2 id="Swashbuckle-AspNetCore-SwaggerUI"><a href="#Swashbuckle-AspNetCore-SwaggerUI" class="headerlink" title="Swashbuckle.AspNetCore.SwaggerUI"></a>Swashbuckle.AspNetCore.SwaggerUI</h2><h3 id="Change-Relative-Path-to-the-UI"><a href="#Change-Relative-Path-to-the-UI" class="headerlink" title="Change Relative Path to the UI"></a>Change Relative Path to the UI</h3><p>By default, the Swagger UI will be exposed at “/swagger”. If neccessary, you can alter this when enabling the SwaggerUI middleware:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">app.UseSwaggerUI(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    c.RoutePrefix = <span class="string">"api-docs"</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="List-Multiple-Swagger-Documents"><a href="#List-Multiple-Swagger-Documents" class="headerlink" title="List Multiple Swagger Documents"></a>List Multiple Swagger Documents</h3><p>When enabling the middleware, you’re required to specify one or more Swagger endpoints (fully qualified or relative to the current host) to power the UI. If you provide multiple endpoints, they’ll be listed in the top right corner of the page, allowing users to toggle between the different documents. For example, the following configuration could be used to document different versions of an API.</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">app.UseSwaggerUI(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    c.SwaggerEndpoint(<span class="string">"/swagger/v1/swagger.json"</span>, <span class="string">"V1 Docs"</span>);</span><br><span class="line">    c.SwaggerEndpoint(<span class="string">"/swagger/v2/swagger.json"</span>, <span class="string">"V2 Docs"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Apply-swagger-ui-Parameters"><a href="#Apply-swagger-ui-Parameters" class="headerlink" title="Apply swagger-ui Parameters"></a>Apply swagger-ui Parameters</h3><p>The swagger-ui ships with it’s own set of configuration parameters, all described here <a href="https://github.com/swagger-api/swagger-ui#swaggerui">https://github.com/swagger-api/swagger-ui#swaggerui</a>. In Swashbuckle, most of these are surfaced through the SwaggerUI middleware options:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">app.UseSwaggerUI(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    c.EnabledValidator();</span><br><span class="line">    c.BooleanValues(<span class="keyword">new</span> <span class="keyword">object</span>[] &#123; <span class="number">0</span>, <span class="number">1</span> &#125;);</span><br><span class="line">    c.DocExpansion(<span class="string">"full"</span>);</span><br><span class="line">    c.InjectOnCompleteJavaScript(<span class="string">"/swagger-ui/on-complete.js"</span>);</span><br><span class="line">    c.InjectOnFailureJavaScript(<span class="string">"/swagger-ui/on-failure.js"</span>);</span><br><span class="line">    c.SupportedSubmitMethods(<span class="keyword">new</span>[] &#123; <span class="string">"get"</span>, <span class="string">"post"</span>, <span class="string">"put"</span>, <span class="string">"patch"</span> &#125;);</span><br><span class="line">    c.ShowRequestHeaders();</span><br><span class="line">    c.ShowJsonEditor();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>Most of them are self explanatory, mapping back to the corresponding swagger-ui docs. To inject custom JavaScript (i.e. <em>InjectOnCompleteJavaScript</em> and <em>InjectOnFailureJavaScript</em>), you’ll need to add the scripts to your application and provide the relative paths as shown above. In ASP.NET Core, this is easily done by placing your script files in the <em>wwwroot</em> folder.</p>
+<h3 id="Inject-Custom-CSS"><a href="#Inject-Custom-CSS" class="headerlink" title="Inject Custom CSS"></a>Inject Custom CSS</h3><p>To tweak the look and feel, you can inject additional CSS stylesheets by adding them to your <em>wwwroot</em> folder and specifying the relative paths in the middleware options:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">app.UseSwaggerUI(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    c.InjectStylesheet(<span class="string">"/swagger-ui/custom.css"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Enable-OAuth2-0-Flows"><a href="#Enable-OAuth2-0-Flows" class="headerlink" title="Enable OAuth2.0 Flows"></a>Enable OAuth2.0 Flows</h3><p>The swagger-ui has built-in support to participate in OAuth2.0 authorization flows. It interacts with authorization and/or token endpoints, as specified in the Swagger JSON, to obtain access tokens for subsequent API calls. See <a href="#add-security-definitions-and-requirements">Adding Security Definitions and Requirements</a> for an example of adding OAuth2.0 metadata to the generated Swagger.</p>
+<p>If you’re Swagger endpoint includes the appropriate security metadata, you can enable the UI interaction as follows:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">app.UseSwaggerUI(c =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// Provide client ID, client ID, realm and application name</span></span><br><span class="line">    c.ConfigureOAuth2(<span class="string">"swagger-ui"</span>, <span class="string">"swagger-ui-secret"</span>, <span class="string">"swagger-ui-realm"</span>, <span class="string">"Swagger UI"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>–&gt;</p>
+-->
+      
+    </div>
+    
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/NET/" rel="tag">#.NET</a>
+          
+            <a href="/tags/swagger/" rel="tag">#swagger</a>
+          
+            <a href="/tags/生成文档/" rel="tag">#生成文档</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/OAuth-1/" rel="next" title="OAuth 2.0 认证框架（一）">
+                <i class="fa fa-chevron-left"></i> OAuth 2.0 认证框架（一）
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/ManualResetEvent-and-AutoResetEvent/" rel="prev" title="ManualResetEvent 与 AutoResetEvent 简介">
+                ManualResetEvent 与 AutoResetEvent 简介 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/03/DotNET-Tools-1/" data-title="一些实用的 .NET 开发工具（一）：swagger" data-url="https://HaleLu.github.io/2017/03/DotNET-Tools-1/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="https://avatars3.githubusercontent.com/u/10864533" alt="Hale Lu">
+          <p class="site-author-name" itemprop="name">Hale Lu</p>
+          <p class="site-description motion-element" itemprop="description">一只欠觉的开发狗</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/halelu" target="_blank" title="Github">
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/hao-lu-42-29" target="_blank" title="知乎">
+                  
+                  知乎
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://wpa.qq.com/msgrd?v=3&uin=773622805&site=qq&menu=yes" target="_blank" title="QQ">
+                  
+                  QQ
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa fa-globe fa-fw"></i>
+              各路大神
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://pmextra.github.io/" title="PM Extra's Blog" target="_blank">PM Extra's Blog</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://hzlclock.wordpress.com/" title="Hebert's Blog" target="_blank">Hebert's Blog</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.rexskz.info/" title="Rex's Blog" target="_blank">Rex's Blog</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#swagger-是什么？"><span class="nav-number">1.</span> <span class="nav-text">swagger 是什么？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Getting-Started"><span class="nav-number">2.</span> <span class="nav-text">Getting Started</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Swashbuckle-amp-ApiExplorer"><span class="nav-number">3.</span> <span class="nav-text">Swashbuckle &amp; ApiExplorer</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#组件"><span class="nav-number">4.</span> <span class="nav-text">组件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置-amp-自定义"><span class="nav-number">5.</span> <span class="nav-text">配置 &amp; 自定义</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Swashbuckle-AspNetCore-Swagger"><span class="nav-number">5.1.</span> <span class="nav-text">Swashbuckle.AspNetCore.Swagger</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修改-Swagger-JSON-路径"><span class="nav-number">5.1.1.</span> <span class="nav-text">修改 Swagger JSON 路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-HTTP-请求信息修改-Swagger"><span class="nav-number">5.1.2.</span> <span class="nav-text">使用 HTTP 请求信息修改 Swagger</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Swashbuckle-AspNetCore-SwaggerGen"><span class="nav-number">5.2.</span> <span class="nav-text">Swashbuckle.AspNetCore.SwaggerGen</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#列举-HTTP-responses"><span class="nav-number">5.2.1.</span> <span class="nav-text">列举 HTTP responses</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#指定-HTTP-responses"><span class="nav-number">5.2.1.1.</span> <span class="nav-text">指定 HTTP responses</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-XML-注释生成描述"><span class="nav-number">5.2.2.</span> <span class="nav-text">使用 XML 注释生成描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#提供全局-API-Metadata"><span class="nav-number">5.2.3.</span> <span class="nav-text">提供全局 API Metadata</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hale Lu</span>
+</div>
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="http://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"halelu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      
+      <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+      <script src="/js/src/hook-duoshuo.js"></script>
+    
+  
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';                
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+                            
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').mousedown(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("ABk8fYaVcvf6P6IuuGNY2rRa-gzGzoHsz", "3Vpj3qkDsPj8Rlh92mHOxAMV");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>
