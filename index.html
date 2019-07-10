@@ -343,45 +343,13 @@
 
       
         
-          
-            <p>本篇讲解分布式系统共识算法raft的基本姿势，<a href="https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf" target="_blank" rel="noopener">相关论文</a>可点击这里。</p>
-<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Paxos作为一套可以解决分布式场景下高容错（半数以内的机器挂掉）的共识算法被广泛接受，然而由于其难以被理解所以少有直接的实现。Raft的本质其实是对Paxos协议加强后的一种实现方式，对诸多细节进行了定义，使得这套系统变得易于实现。（个人认为，其实不得不承认的是，这样的代价是降低了效率）。</p>
-<p>Raft类似于其他的共识算法，但它有几个独有的特征———</p>
-<ul>
-<li>强leader：Raft的leader相比其他算法要更强，例如log entry（理解为一条记录）只允许从leader通知给其他服务器，这使得log entry的分发变得简单易于理解；</li>
-<li>leader选举：Raft中每个服务器都有自己不同的（随机）竞选周期。这一对心跳机制的独特改进有效解决了可能出现的选举冲突问题；</li>
-<li>成员变更：Raft在变更服务器集群成员时使用了新的联合共识方法，切换期间两个不同配置的大多数服务器保持重叠。</li>
-</ul>
-<p>看不懂没关系，往下看。</p>
-<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>首先讲一讲共识算法的一些基本概念（不仅仅是raft协议）。</p>
-<h3 id="可复制状态机"><a href="#可复制状态机" class="headerlink" title="可复制状态机"></a>可复制状态机</h3><p>共识算法基本讲的都是基于可复制状态机的共识算法，服务器集合中的所有状态机都可以通过相同的日志拷贝计算得到相同的状态，即使一些（不超过半数）服务器出现异常也一样能保持一致。可复制状态机是众多大型分布式系统的基础。例如包括GFS、HDFS、RAMCloud等通常使用分布式的可复制状态机管理leader选举和保存配置信息。常见的可复制状态机的例子包括Chubby和ZooKeeper。</p>
-<p>可复制状态机通常通过可复制log实现。每台服务器保存了相同的所有历史command的log，状态机依次执行这些command可以得到相同的状态和输出。（类比git）</p>
-<h3 id="角色"><a href="#角色" class="headerlink" title="角色"></a>角色</h3><p>在共识协议中通常节点服务器有三种状态——leader、candidate和follower。</p>
-<ul>
-<li>leader：通常由leader决定确认command的写入，或者在数据不一致时决定使用的内容，或者由leader负责分发内容。</li>
-<li>candidate：candidate是候选人，candidate并不总是存在。当leader节点出现异常或某些情况下，follower会成为candidate并通过获得多数确认成为leader。</li>
-<li>follower：follower作为分布式的执行机，接收执行来自leader的执行等。</li>
-</ul>
-<p>服务器节点的角色会在三种状态间根据规则切换。</p>
-<h3 id="行为"><a href="#行为" class="headerlink" title="行为"></a>行为</h3><ul>
-<li>心跳检测：所有follower和leader间会通过心跳保证连接正常。当follower长时间无法收到leader的心跳时或心跳回复时判定leader挂掉（真实情况下也可能是自己网络挂了）</li>
-<li>leader选举：当目前的leader无法正常工作或连接到时，需要进行leader选举选出新的leader，一些follower会成为candidate，并在获得半数赞同投票时成为新的leader</li>
-<li>投票：当收到竞选请求时决定是否选举candidate为leader</li>
-<li>log分发：leader会接受来自客户端的log，然后将其分发复制给整个集群，同时强制要求其他节点与自己一致</li>
-</ul>
-<h2 id="raft基础"><a href="#raft基础" class="headerlink" title="raft基础"></a>raft基础</h2><p>在raft中，follower是完全被动的：follower不主动发送任何请求，只对leader和candidate的请求做回应。（如果客户端向follower发送了command，follower将其重定向到leader）只有leader拥有log的写入权限，所有的command由leader先接受，然后分发给所有follower，不一致时可覆盖follower内容。下图简要展示了各角色切换的条件。</p>
-<p><img src=".png" alt></p>
-<p>raft采用任期制，任期用递增的整数表示。leader由选举选出，在竞选时会有一到多个candidate尝试成为leader，当candidate赢得竞选后，它会转变为该任期的leader直到新的任期。在某些情况下，投票可能无法产生大多数同意的情况（比如3个candidate每人获得了总数1/3节点的支持），那么很快新的任期（新的选举）会再次开始以打破局面。由此可以看出，raft保证了每一任期至多有一个leader。</p>
-<p>然而作为分布式系统，不同的节点可能并不总是同时能观察到任期的更迭，甚至某些情况下某个节点可能会错过整个选举甚至整个任期，所以对于每个节点而言，都会存有一份当前任期和当前leader。所有的节点间通信都会带上任期信息以校验传来的或自己节点的数据是否过期，并更新或通知更新。当candidate发现自己的term已经过旧则立刻回归follower状态。对于过旧的请求服务器直接拒绝执行。</p>
-<p>raft节点间通过RPC通信。具体的RPC格式在下文解释。</p>
-<h2 id="raft实现"><a href="#raft实现" class="headerlink" title="raft实现"></a>raft实现</h2><h3 id="状态"><a href="#状态" class="headerlink" title="状态"></a>状态</h3><h4 id="持久状态"><a href="#持久状态" class="headerlink" title="持久状态"></a>持久状态</h4><p>这些状态信息需要在每次响应RPC前更新到静态存储</p>
-<ul>
-<li>currentTerm：节点观察到的最新任期（初始化为0，递增）</li>
-<li>votedFor：当前任期选举环节投给的candidate节点ID</li>
-<li>log[]：log条目数组，每个条目都包含一条状态机command和收到该指令时的任期（首条下标为1）</li>
-</ul>
-<h4 id="所有服务的易失状态"><a href="#所有服务的易失状态" class="headerlink" title="所有服务的易失状态"></a>所有服务的易失状态</h4>
-          
+          <p>本篇讲解分布式系统共识算法 raft 的基本姿势，<a href="https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf" target="_blank" rel="noopener">相关论文</a>可点击这里。</p>
+<p>注：此篇尚未整理完成，虽然代码已经完成，但因一些变故，日后再继续整理</p>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2019/01/raft/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -730,7 +698,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-count">28</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
