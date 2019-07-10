@@ -4,6 +4,70 @@
   
     
     <entry>
+      <title><![CDATA[JVM参数详解]]></title>
+      <url>https://HaleLu.github.io/2019/07/jvm/</url>
+      <content type="html"><![CDATA[<p>此篇从当前实际接触到的生产环境配置出发，聊聊 JVM 的机制以及参数设置。</p>
+<a id="more"></a>
+
+<h2 id="配置举例"><a href="#配置举例" class="headerlink" title="配置举例"></a>配置举例</h2><p>先看一个当前使用的 jvm 配置（为方便阅读我加了换行和适当注释）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/jdk8/bin/java</span><br><span class="line">-Djava.util.logging.config.file=/usr/local/webserver/app-name/conf/logging.properties</span><br><span class="line">-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager</span><br><span class="line">-XX:MetaspaceSize=256M // 初始元空间大小(也是初始的阈值，即初始的high-water-mark)，达到该值就会触发垃圾收集进行类型卸载，同时GC会对该值进行调整：如果释放了大量的空间，就适当降低该值；如果释放了很少的空间，那么在不超过MaxMetaspaceSize时，适当提高该值</span><br><span class="line">-XX:MaxMetaspaceSize=256M // 最大元空间大小</span><br><span class="line">-Xms4g // 初始内存 4g</span><br><span class="line">-Xmx4g // 最大内存 4g</span><br><span class="line">-Xmn1g // 新生代 1g</span><br><span class="line">-Xss256k // 每个线程的内存大小</span><br><span class="line">-XX:SurvivorRatio=8 // Eden 区与 Survivor 区的大小比值 1:1:8</span><br><span class="line">-XX:MaxTenuringThreshold=8 // 垃圾最大年龄</span><br><span class="line">-XX:ParallelGCThreads=8 // 并行收集器的线程数</span><br><span class="line">-XX:+UseConcMarkSweepGC // 使用 CMS 内存收集</span><br><span class="line">-XX:+UseParNewGC // 设置年轻代为并行收集 可与 CMS 收集同时使用</span><br><span class="line">-XX:+DisableExplicitGC // 关闭 System.gc()</span><br><span class="line">-XX:+CMSParallelRemarkEnabled // 启用并行标记</span><br><span class="line">-XX:+CMSClassUnloadingEnabled // 启用永久代的类卸载</span><br><span class="line">-XX:CMSInitiatingOccupancyFraction=70 // 使用 70％后开始 CMS 收集</span><br><span class="line">-XX:+UseCMSCompactAtFullCollection // 在 Full GC 的时候，对年老代的压缩</span><br><span class="line">                                   // CMS 是不会移动内存的，因此，这个非常容易产生碎片，导致内存不够用，因此，内存的压缩这个时候就会被启用。</span><br><span class="line">-XX:CMSFullGCsBeforeCompaction=5 // 多少 Full GC 次后进行内存压缩</span><br><span class="line">                                 // 由于并发收集器不对内存空间进行压缩，整理，所以运行一段时间以后会产生&quot;碎片&quot;，使得运行效率降低。此值设置运行多少次GC以后对内存空间进行压缩，整理。增加这个参数是个好习惯。可能会影响性能，但是可以消除碎片</span><br><span class="line">-XX:+CMSScavengeBeforeRemark // 重新标记之前对年轻代做一次 minor GC，以期望在对老年代GC的时候可以清除更多的对象，针对 Remark 停顿太长的情况，代价是多一次 minor GC</span><br><span class="line">-XX:+HeapDumpOnOutOfMemoryError // 内存溢出时导出堆信息</span><br><span class="line">-Xloggc:/usr/local/webserver/app-name/logs/gc.log // gc日志</span><br><span class="line">-XX:+UseGCLogFileRotation // 启用GC日志文件的自动转储</span><br><span class="line">-XX:NumberOfGCLogFiles=10</span><br><span class="line">-XX:GCLogFileSize=10M</span><br><span class="line">-XX:+PrintGCDetails</span><br><span class="line">-XX:+PrintGCDateStamps</span><br><span class="line">-XX:+PrintGCApplicationStoppedTime</span><br><span class="line">-XX:+PrintGCApplicationConcurrentTime -Dcom.sun.management.jmxremote.password.file=/usr/local/webserver/app-name/conf/jmxremote.password</span><br><span class="line">-Dcom.sun.management.jmxremote.access.file=/usr/local/webserver/app-name/conf/jmxremote.access -Dcom.sun.management.jmxremote.ssl=false</span><br><span class="line">-XX:+CMSConcurrentMTEnabled</span><br><span class="line">-XX:+ExplicitGCInvokesConcurrent</span><br><span class="line">-XX:HeapDumpPath=/usr/local/webserver/app-name/logs/app-name.hprof</span><br><span class="line">-javaagent:/opt/jars/aspectjweaver-1.8.9.jar -Djdk.tls.ephemeralDHKeySize=2048</span><br><span class="line">-Djava.protocol.handler.pkgs=org.apache.catalina.webresources</span><br><span class="line">-Djava.endorsed.dirs=/usr/local/webserver/app-name/endorsed</span><br><span class="line">-classpath /usr/local/webserver/app-name/bin/bootstrap.jar:/usr/local/webserver/app-name/bin/tomcat-juli.jar</span><br><span class="line">-Dcatalina.base=/usr/local/webserver/app-name</span><br><span class="line">-Dcatalina.home=/usr/local/webserver/app-name</span><br><span class="line">-Djava.io.tmpdir=/usr/local/webserver/app-name/temp</span><br><span class="line">org.apache.catalina.startup.Bootstrap start</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置解读"><a href="#配置解读" class="headerlink" title="配置解读"></a>配置解读</h2><p>除去一些日志和路径配置，其他主要包含两种配置</p>
+<h3 id="内存配置"><a href="#内存配置" class="headerlink" title="内存配置"></a>内存配置</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-XX:MetaspaceSize=256M // 初始元空间大小(也是初始的阈值，即初始的high-water-mark)，达到该值就会触发垃圾收集进行类型卸载，同时GC会对该值进行调整：如果释放了大量的空间，就适当降低该值；如果释放了很少的空间，那么在不超过MaxMetaspaceSize时，适当提高该值</span><br><span class="line">-XX:MaxMetaspaceSize=256M // 最大元空间大小</span><br><span class="line">-Xms4g // 初始内存 4g</span><br><span class="line">-Xmx4g // 最大内存 4g</span><br><span class="line">-Xmn1g // 新生代 1g</span><br><span class="line">-Xss256k // 每个线程的内存大小</span><br><span class="line">-XX:SurvivorRatio=8 // Eden 区与 Survivor 区的大小比值 1:1:8</span><br></pre></td></tr></table></figure>
+
+<p>可以看到我们目前使用的参数是 4G 内存，其中新生代指定 1G，老年代则为剩下的 3G。元数据区的大小为 256M。单线程最大 256k。</p>
+<p>这边值得一提的是，从 JAVA 8 开始，永久代被移除出 JVM，改为元数据（metadata）区。</p>
+<h3 id="GC-策略配置"><a href="#GC-策略配置" class="headerlink" title="GC 策略配置"></a>GC 策略配置</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">-XX:SurvivorRatio=8 // Eden 区与 Survivor 区的大小比值 1:1:8</span><br><span class="line">-XX:MaxTenuringThreshold=8 // 垃圾最大年龄</span><br><span class="line">-XX:ParallelGCThreads=8 // 并行收集器的线程数</span><br><span class="line">-XX:+UseConcMarkSweepGC // 使用 CMS 收集器</span><br><span class="line">-XX:+UseParNewGC // 年轻代使用 ParNew 收集器，可与 CMS 收集同时使用</span><br><span class="line">-XX:+DisableExplicitGC // 关闭 System.gc()</span><br><span class="line">-XX:+CMSParallelRemarkEnabled // 启用并行标记</span><br><span class="line">-XX:+CMSClassUnloadingEnabled // 启用永久代的类卸载</span><br><span class="line">-XX:CMSInitiatingOccupancyFraction=70 // 使用 70％后开始 CMS 收集</span><br><span class="line">-XX:+UseCMSCompactAtFullCollection // 在 Full GC 的时候，对年老代的压缩</span><br><span class="line">                                   // CMS 是不会移动内存的，因此，这个非常容易产生碎片，导致内存不够用，因此，内存的压缩这个时候就会被启用。</span><br><span class="line">-XX:CMSFullGCsBeforeCompaction=5 // 多少 Full GC 次后进行内存压缩</span><br><span class="line">                                 // 由于并发收集器不对内存空间进行压缩，整理，所以运行一段时间以后会产生&quot;碎片&quot;，使得运行效率降低。此值设置运行多少次GC以后对内存空间进行压缩，整理。增加这个参数是个好习惯。可能会影响性能，但是可以消除碎片</span><br><span class="line">-XX:+CMSScavengeBeforeRemark // 重新标记之前对年轻代做一次 minor GC，以期望在对老年代GC的时候可以清除更多的对象，针对 Remark 停顿太长的情况，代价是多一次 minor GC</span><br><span class="line">-XX:+CMSConcurrentMTEnabled // 并发的CMS阶段将以多线程执行(因此，多个GC线程会与所有的应用程序线程并行工作)。</span><br><span class="line">-XX:+ExplicitGCInvokesConcurrent</span><br></pre></td></tr></table></figure>
+
+<p>首先可以看到使用的收集器为 ParNew + CMS，这里简单介绍一下两种 GC 策略</p>
+<h4 id="ParNew-收集器"><a href="#ParNew-收集器" class="headerlink" title="ParNew 收集器"></a>ParNew 收集器</h4><p>ParNew 常被用作新生代的收集器，具体策略如下：</p>
+<ol>
+<li>等待所有执行中的用户线程进行到 safepoint，然后 Stop the World</li>
+<li>并行进行 GC，采用标记-复制算法清理新生代</li>
+</ol>
+<h4 id="CMS-收集器"><a href="#CMS-收集器" class="headerlink" title="CMS 收集器"></a>CMS 收集器</h4><p>CMS 是目前最常用的老年代收集器，其主要步骤如下：</p>
+<ol>
+<li>等待所有执行中的用户线程进行到 safepoint，然后 Stop the World</li>
+<li>单线程进行初始标记，标记 GC Roots（本地变量、方法区中静态对象、常量、JNI 中对象）</li>
+<li>和用户进程并行，进行并发标记，逐级搜索 GC Roots 进行可达性分析</li>
+<li>再次等待所有执行中的用户线程进行到 safepoint，然后 Stop the World</li>
+<li>和用户进程并行，进行重新标记，修正标记产生变动的那一部分</li>
+<li>和用户进程并行，清理老年代对象（并不整理）</li>
+<li>和用户进程并行，清理并恢复在 CMS GC 过程中的各种状态，重新初始化 CMS 相关数据结构</li>
+</ol>
+<p>再回头来看这套配置：</p>
+<ul>
+<li>新生代的 Eden 区与 Survivor 区的大小比值 1:1:8</li>
+<li>新生代经过 8 次 minor GC 后进入老年代；</li>
+<li>GC 的并行数为 8</li>
+<li>关闭显式 GC（即 System.gc()）</li>
+<li>启用类卸载，即会回收元数据空间</li>
+<li>老年代使用 70%后开始 CMS 收集</li>
+<li>每 5 次 CMS 收集后整理老年代内存（因为 CMS 收集只会对老年代的对象执行清除操作，并不会整理，长期后会产生过多的碎片，导致实际内存足够但无法申请出足够的内存）</li>
+<li>在 CMS 的重新标记（第五步）前对年轻代执行一次 minor GC（这样在对老年代重新标记时可以清除出更多的对象）</li>
+<li>CMS 与用户进程并发的阶段会启动多个 GC 进程并发</li>
+<li>开启并行显式 Full GC，但其实在这是个废配置，因为 DisableExplicitGC 已经禁用了显式 Full GC</li>
+</ul>
+]]></content>
+      
+        <categories>
+            
+            <category> 技术 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 技术 </tag>
+            
+            <tag> JAVA </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[raft]]></title>
       <url>https://HaleLu.github.io/2019/01/raft/</url>
       <content type="html"><![CDATA[<p>本篇讲解分布式系统共识算法 raft 的基本姿势，<a href="https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf" target="_blank" rel="noopener">相关论文</a>可点击这里。</p>
@@ -161,11 +225,11 @@
         
         <tags>
             
-            <tag> 技术 </tag>
-            
             <tag> .NET </tag>
             
             <tag> C# </tag>
+            
+            <tag> 技术 </tag>
             
         </tags>
         
@@ -946,9 +1010,9 @@ With the setup described above, the generator will include all API operations in
         
         <tags>
             
-            <tag> 技术 </tag>
-            
             <tag> .NET </tag>
+            
+            <tag> 技术 </tag>
             
             <tag> WCF </tag>
             
@@ -1016,9 +1080,9 @@ With the setup described above, the generator will include all API operations in
         
         <tags>
             
-            <tag> 技术 </tag>
-            
             <tag> .NET </tag>
+            
+            <tag> 技术 </tag>
             
         </tags>
         
