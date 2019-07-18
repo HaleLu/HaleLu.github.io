@@ -17,6 +17,7 @@
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">context-param</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">param-name</span>&gt;</span>contextConfigLocation<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">param-value</span>&gt;</span>/WEB-INF/daoContext.xml /WEB-INF/applicationContext.xml<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">context-param</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">listener</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">listener-class</span>&gt;</span>org.springframework.web.context.ContextLoaderListener<span class="tag">&lt;/<span class="name">listener-class</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">listener</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <p>下图简要展示了 Spring IoC 容器的工作，你的 POJOs 结合配置项元数据，这样，ApplicationContext 创建并初始化后，你就拥有了一个配置完全且可运行的系统/应用。</p>
+<p><img src="./spring-1/container-magic.png" alt></p>
 <h3 id="配置项元数据-Configuration-Metadata"><a href="#配置项元数据-Configuration-Metadata" class="headerlink" title="配置项元数据(Configuration Metadata)"></a>配置项元数据(Configuration Metadata)</h3><p>上文说了，Spring IoC 容器使用配置项元数据的形式配置，支持传统的 XML 格式，从 Spring 2.5 开始支持基于注解的配置项元数据，从 3.0 开始，Spring JavaConfig 提供的很多特性使你可以通过一些类来定义 beans，包括 @Configuration、 @Bean、@Import 以及 @DependsOn 等注解。</p>
 <p>Spring 配置项包含一个或多个容器管理的 bean 定义(definition)。在 XML 中使用<code>&lt;beans/&gt;</code>中的<code>&lt;bean/&gt;</code>标签，代码方式则在<code>@Configuration</code>注解的类中使用<code>@Bean</code>注解的方法。通常我们用其定义服务层对象、DAOs、展示对象、基础设置对象（例如一些框架工厂类）等等。通常在容器中不注册细粒度的域对象，因为这通常是 DAOs 的责任，应当又业务逻辑创建和加载这些对象。不过，你可以使用 Spring 的 AspectJ 集成来注册在 IoC 容器控制之外创建的对象。详见下文。</p>
 <p>以下是一个典型的 XML 配置项元数据。</p>
@@ -457,9 +458,9 @@
         
         <tags>
             
-            <tag> 阅读 </tag>
-            
             <tag> Spring </tag>
+            
+            <tag> 阅读 </tag>
             
             <tag> Java </tag>
             
@@ -635,9 +636,9 @@
         
         <tags>
             
-            <tag> Redis </tag>
-            
             <tag> 阅读 </tag>
+            
+            <tag> Redis </tag>
             
             <tag> C </tag>
             
