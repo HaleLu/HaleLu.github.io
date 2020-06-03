@@ -1,0 +1,1148 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="阅读,Spring,Java,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1">
+
+
+
+
+
+
+<meta name="description" content="书接上文 接下来到 Spring framework core 的第二大块 —— 资源">
+<meta name="keywords" content="阅读,Spring,Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring进阶 - 资源">
+<meta property="og:url" content="https://HaleLu.github.io/2020/06/spring-3/index.html">
+<meta property="og:site_name" content="Move your idea forward.">
+<meta property="og:description" content="书接上文 接下来到 Spring framework core 的第二大块 —— 资源">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-06-03T15:56:48.913Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring进阶 - 资源">
+<meta name="twitter:description" content="书接上文 接下来到 Spring framework core 的第二大块 —— 资源">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6279916590628603000,
+      author: '（博主大人~）'
+    }
+  };
+</script>
+
+  <title> Spring进阶 - 资源 | Move your idea forward. </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-77199457-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Move your idea forward.</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Hale Lu's Blog</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Spring进阶 - 资源
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2020-06-03T22:41:25+08:00" content="2020-06-03">
+              2020-06-03
+            </time>
+          </span>
+
+          
+            <span class="post-category">
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2020/06/spring-3/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/06/spring-3/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+             <span id="/2020/06/spring-3/" class="leancloud_visitors" data-flag-title="Spring进阶 - 资源">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>书接<a href="https://halelu.github.io/2020/04/spring-2/">上文</a></p>
+<p>接下来到 Spring framework core 的第二大块 —— 资源</p>
+<a id="more"></a>
+
+<h1 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h1><p>本章介绍了 Spring 如何处理资源以及如何在 Spring 中使用资源。它包括以下主题：</p>
+<ul>
+<li>介绍</li>
+<li>Resource 接口</li>
+<li>内置 Resource 实现</li>
+<li>ResourceLoader</li>
+<li><code>ResourceLoaderAware</code> 接口</li>
+<li>资源依赖</li>
+<li>应用程序上下文和资源路径</li>
+</ul>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>不幸的是，Java 的标准 <code>java.net.URL</code> 类和用于各种 URL 前缀的标准处理程序不足以满足所有对低级资源的访问。例如，没有标准化的 <code>URL</code> 实现可用于访问需要从类路径或相对于 <code>ServletContext</code> 获得的资源。 虽然可以注册用于特殊 <code>URL</code> 前缀的新处理程序（类似于用于诸如 <code>http:</code> 的现有前缀的处理程序），但这通常相当复杂，并且 <code>URL</code> 接口仍然缺少某些理想的功能，例如用于检查是否存在的方法指向的资源。</p>
+<h2 id="Resource-接口"><a href="#Resource-接口" class="headerlink" title="Resource 接口"></a>Resource 接口</h2><p>Spring 的 <code>Resource</code> 接口旨在成为一种功能更强大的接口，用于抽象化对低级资源的访问。以下清单显示了 <code>Resource</code> 接口定义：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Resource</span> <span class="keyword">extends</span> <span class="title">InputStreamSource</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">exists</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isOpen</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">URL <span class="title">getURL</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">File <span class="title">getFile</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">Resource <span class="title">createRelative</span><span class="params">(String relativePath)</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">String <span class="title">getFilename</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">String <span class="title">getDescription</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如 <code>Resource</code> 接口的定义所示，它扩展了 <code>InputStreamSource</code> 接口。以下清单显示了 <code>InputStreamSource</code> 接口的定义：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">InputStreamSource</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function">InputStream <span class="title">getInputStream</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Resource 接口中一些最重要的方法是：</p>
+<ul>
+<li><code>getInputStream()</code>：找到并打开资源，返回一个 <code>InputStream</code> 以便从资源中读取。预期每次调用都返回一个新的 <code>InputStream</code>。调用方有责任关闭流。</li>
+<li><code>exist()</code>：返回一个布尔值，指示此资源是否实际以物理形式存在。</li>
+<li><code>isOpen()</code>：返回一个布尔值，指示此资源是否表示具有打开流的句柄。如果为 true，则不能多次读取 <code>InputStream</code>，必须只读取一次，然后将其关闭以避免资源泄漏。对于所有常规资源实现，返回 <code>false</code>，但 <code>InputStreamResource</code> 除外。</li>
+<li><code>getDescription()</code>：返回对此资源的描述，用于在处理资源时用于错误输出。这通常是标准文件名或资源的实际 URL。</li>
+</ul>
+<p>其他方法可让您获取代表资源的实际 <code>URL</code> 或 <code>File</code> 对象（如果基础实现兼容并且支持该功能）。</p>
+<p>当需要资源时，Spring 本身广泛使用 <code>Resource</code> 抽象作为许多方法签名中的参数类型。一些 Spring API 中的其他方法（例如，各种 <code>ApplicationContext</code> 实现的构造函数）采用 String 形式，该字符串以未经修饰或简单的形式用于创建适合该上下文实现的 <code>Resource</code>，或者通过 String 路径上的特殊前缀，让调用者指定必须创建并使用特定的资源实现。</p>
+<p>尽管 Spring 经常使用 <code>Resource</code> 接口，但实际上，在您自己的代码中单独用作通用实用工具类来访问资源也非常有用，即使您的代码不了解也不关心 Spring 的其他任何部分。虽然这将您的代码耦合到 Spring，但实际上仅将其耦合到这套实用程序类，它们充当 <code>URL</code> 的更强大替代，并且可以被视为等同于您将用于此目的的任何其他库。</p>
+<blockquote>
+<p><code>Resource</code> 抽象不能替代功能。它尽可能地包装它。例如，<code>UrlResource</code> 包装一个 <code>URL</code>，然后使用包装的 <code>URL</code> 进行工作。</p>
+</blockquote>
+<h2 id="内置-Resource-实现"><a href="#内置-Resource-实现" class="headerlink" title="内置 Resource 实现"></a>内置 Resource 实现</h2><p>Spring 包含以下 Resource 实现：</p>
+<ul>
+<li>UrlResource</li>
+<li>ClassPathResource</li>
+<li>FileSystemResource</li>
+<li>ServletContextResource</li>
+<li>InputStreamResource</li>
+<li>ByteArrayResource</li>
+</ul>
+<h3 id="UrlResource"><a href="#UrlResource" class="headerlink" title="UrlResource"></a>UrlResource</h3><p><code>UrlResource</code> 包装了 <code>java.net.URL</code>，可用于访问通常可以通过 URL 访问的任何对象，例如文件、HTTP 目标、FTP 目标等。所有 URL 都具有标准化的 String 表示形式，因此使用适当的标准化前缀来指示另一种 URL 类型。其中包括 <code>file:</code> 用于访问文件系统路径，<code>http:</code> 用于通过 HTTP 协议访问资源，<code>ftp:</code> 用于通过 FTP 访问资源等。</p>
+<p><code>UrlResource</code> 是由 Java 代码通过显式使用 <code>UrlResource</code> 构造函数创建的，但通常在调用带有 String 参数表示路径的 API 方法时隐式创建。对于后一种情况，JavaBeans <code>PropertyEditor</code> 最终决定要创建哪种类型的资源。如果路径字符串包含众所周知的前缀（例如 <code>classpath:</code>），则它将为该前缀创建适当的专用资源。但是，如果它不能识别前缀，则假定该字符串是标准 URL 字符串并创建一个 <code>UrlResource</code>。</p>
+<h3 id="ClassPathResource"><a href="#ClassPathResource" class="headerlink" title="ClassPathResource"></a>ClassPathResource</h3><p>此类表示应从类路径获取的资源。它使用线程上下文类加载器，给定的类加载器或给定的类来加载资源。</p>
+<p>如果类路径资源驻留在文件系统中，而不是驻留在 jar 中并且尚未（通过 servlet 引擎或任何环境将其扩展到）文件系统的类路径资源驻留在文件系统中，则此 <code>Resource</code> 实现以 <code>java.io.File</code> 支持解析。 。为了解决这个问题，各种 <code>Resource</code> 实现始终支持将解析作为 <code>java.net.URL</code>。</p>
+<p>Java 代码通过显式使用 <code>ClassPathResource</code> 构造函数来创建 <code>ClassPathResource</code>，但通常在调用带有 String 参数表示路径的 API 方法时隐式创建 <code>ClassPathResource</code>。对于后一种情况，JavaBeans PropertyEditor 可以识别字符串路径上的特殊前缀 <code>classpath:</code>，并在这种情况下创建 <code>ClassPathResource</code>。</p>
+<h3 id="FileSystemResource"><a href="#FileSystemResource" class="headerlink" title="FileSystemResource"></a>FileSystemResource</h3><p>这是 <code>java.io.File</code> 和 <code>java.nio.file.Path</code> 句柄的 <code>Resource</code> 实现。它支持解析为 <code>File</code> 和 <code>URL</code>。</p>
+<h3 id="ServletContextResource"><a href="#ServletContextResource" class="headerlink" title="ServletContextResource"></a>ServletContextResource</h3><p>这是 <code>ServletContext</code> 资源的 <code>Resource</code> 实现，它解释相关 Web 应用程序根目录中的相对路径。</p>
+<p>它始终支持流访问和 URL 访问，但仅在扩展 Web 应用程序档案且资源实际位于文件系统上时才允许 java.io.File 访问。它是在文件系统上扩展还是直接扩展，或者直接从 JAR 或其他类似数据库（可以想到的）中访问，实际上取决于 Servlet 容器。</p>
+<h3 id="InputStreamResource"><a href="#InputStreamResource" class="headerlink" title="InputStreamResource"></a>InputStreamResource</h3><p><code>InputStreamResource</code> 是给定 <code>InputStream</code> 的 <code>Resource</code> 实现。仅当没有特定的资源实现适用时才应使用它。特别是，在可能的情况下，最好选择 <code>ByteArrayResource</code> 或任何基于文件的 <code>Resource</code> 实现。</p>
+<p>与其他 <code>Resource</code> 实现相反，这是一个已经打开的资源的描述符。因此，它从 <code>isOpen()</code> 返回 true。如果需要将资源描述符保留在某个地方，或者需要多次读取流，请不要使用它。</p>
+<h3 id="ByteArrayResource"><a href="#ByteArrayResource" class="headerlink" title="ByteArrayResource"></a>ByteArrayResource</h3><p>这是给定字节数组的 <code>Resource</code> 实现。它为给定的字节数组创建一个 <code>ByteArrayInputStream</code>。</p>
+<p>这对于从任何给定的字节数组加载内容很有用，而不必求助于一次性的 <code>InputStreamResource</code>。</p>
+<h2 id="ResourceLoader"><a href="#ResourceLoader" class="headerlink" title="ResourceLoader"></a>ResourceLoader</h2><p><code>ResourceLoader</code> 接口旨在由可以返回（即加载）<code>Resource</code> 实例的对象实现。以下显示了 <code>ResourceLoader</code> 接口定义：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ResourceLoader</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function">Resource <span class="title">getResource</span><span class="params">(String location)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所有应用程序上下文均实现该 <code>ResourceLoader</code> 接口。因此，所有应用程序上下文都可用于获取 <code>Resource</code> 实例。</p>
+<p>当您调用 <code>getResource()</code> 特定的应用程序上下文时，并且指定的位置路径没有特定的前缀时，您将获得 <code>Resource</code> 适合该特定应用程序上下文的类型。例如，假定针对 <code>ClassPathXmlApplicationContext</code> 实例执行了以下代码段：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Resource template = ctx.getResource(<span class="string">"some/resource/path/myTemplate.txt"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>针对 <code>ClassPathXmlApplicationContext</code>，该代码返回 <code>ClassPathResource</code>。如果对 <code>FileSystemXmlApplicationContext</code> 实例执行相同的方法，则将返回 <code>FileSystemResource</code>。对于 <code>WebApplicationContext</code>，它将返回 <code>ServletContextResource</code>。类似地，它将为每个上下文返回适当的对象。</p>
+<p>所以，您可以以适合特定应用程序上下文的方式加载资源。</p>
+<p>另一方面，<code>ClassPathResource</code> 无论应用程序上下文类型如何，您都可以通过指定特殊 <code>classpath:</code> 前缀来强制使用，如以下示例所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Resource template = ctx.getResource(<span class="string">"classpath:some/resource/path/myTemplate.txt"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>同样，您可以通过指定任何标准 <code>java.net.URL</code> 前缀来强制使用 <code>UrlResource</code>。 以下两个示例使用 <code>file</code> 和 <code>http</code> 前缀：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Resource template = ctx.getResource(<span class="string">"file:///some/resource/path/myTemplate.txt"</span>);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Resource template = ctx.getResource(<span class="string">"https://myhost.com/resource/path/myTemplate.txt"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>下表总结了将 String 对象转换为 Resource 对象的策略：</p>
+<table>
+<thead>
+<tr>
+<th>前缀</th>
+<th>举例</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>classpath:</td>
+<td>classpath:com/myapp/config.xml</td>
+<td>从类路径加载。</td>
+</tr>
+<tr>
+<td>file:</td>
+<td>file:///data/config.xml</td>
+<td>从文件系统作为<code>URL</code>加载。另请参见 <code>FileSystemResource 警告</code>。</td>
+</tr>
+<tr>
+<td>http:</td>
+<td><a href="https://myserver/logo.png" target="_blank" rel="noopener">https://myserver/logo.png</a></td>
+<td>加载为 <code>URL</code>。</td>
+</tr>
+<tr>
+<td>（无）</td>
+<td>/data/config.xml</td>
+<td>取决于基础 ApplicationContext。</td>
+</tr>
+</tbody></table>
+<h2 id="ResourceLoaderAware-接口"><a href="#ResourceLoaderAware-接口" class="headerlink" title="ResourceLoaderAware 接口"></a><code>ResourceLoaderAware</code> 接口</h2><p><code>ResourceLoaderAware</code> 接口是一个特殊的回调接口，用于标识期望提供 <code>ResourceLoader</code> 引用的组件。 以下显示了 <code>ResourceLoaderAware</code> 接口的定义：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ResourceLoaderAware</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setResourceLoader</span><span class="params">(ResourceLoader resourceLoader)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当一个类实现 <code>ResourceLoaderAware</code> 并部署到应用程序上下文中（作为 Spring 托管的 bean）时，该类被应用程序上下文识别为 <code>ResourceLoaderAware</code>。然后，应用程序上下文调用 <code>setResourceLoader(ResourceLoader)</code>，将自身作为参数提供（请记住，Spring 中的所有应用程序上下文均实现 <code>ResourceLoader</code> 接口）。</p>
+<p>由于 <code>ApplicationContext</code> 是 <code>ResourceLoader，因此</code> Bean 也可以实现 <code>ApplicationContextAware</code> 接口，并直接使用提供的应用程序上下文来加载资源。但是，通常，如果需要的话，最好使用专用的 <code>ResourceLoader</code> 接口。该代码将仅耦合到资源加载接口（可以视为实用程序接口），而不耦合到整个 Spring <code>ApplicationContext</code> 接口。</p>
+<p>在应用程序组件中，您还可以依靠自动装配 <code>ResourceLoader</code> 来实现 <code>ResourceLoaderAware</code> 接口。“传统”构造函数和 byType 自动装配模式（如“自动装配协作器”中所述）能够分别为构造函数参数或 setter 方法参数提供 <code>ResourceLoader</code>。为了获得更大的灵活性（包括自动装配字段和多个参数方法的能力），请考虑使用基于注释的自动装配功能。在这种情况下，只要有问题的字段，构造函数或方法带有 <code>@Autowired</code> 批注，<code>ResourceLoader</code> 就会自动连接到需要 <code>ResourceLoader</code> 类型的字段，构造函数参数或方法参数中。有关更多信息，请参见前文。</p>
+<h2 id="资源依赖"><a href="#资源依赖" class="headerlink" title="资源依赖"></a>资源依赖</h2><p>如果 Bean 本身将通过某种动态过程来确定和提供资源路径，那么对于 Bean 来说，使用 <code>ResourceLoader</code> 接口加载资源可能是有意义的。例如，考虑加载某种模板，其中所需的特定资源取决于用户的角色。如果资源是静态的，则有必要完全消除对 <code>ResourceLoader</code> 接口的使用，让 Bean 公开所需的 <code>Resource</code> 属性，并期望将其注入其中。</p>
+<p>然后注入这些属性的琐事是，所有应用程序上下文都注册并使用了特殊的 JavaBeans PropertyEditor，它可以将 String 路径转换为 <code>Resource</code> 对象。 因此，如果 myBean 具有资源类型的模板属性，则可以为该资源配置一个简单的字符串，如以下示例所示：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"myBean"</span> <span class="attr">class</span>=<span class="string">"..."</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"template"</span> <span class="attr">value</span>=<span class="string">"some/resource/path/myTemplate.txt"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>请注意，资源路径没有前缀。因此，由于应用程序上下文本身将用作 <code>ResourceLoader</code>，因此根据上下文的确切类型，通过 <code>ClassPathResource</code>，<code>FileSystemResource</code> 或 <code>ServletContextResource</code> 加载资源本身。</p>
+<p>如果需要强制使用特定的资源类型，则可以使用前缀。 以下两个示例显示了如何强制 <code>ClassPathResource</code> 和 <code>UrlResource</code>（后者用于访问文件系统文件）：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"template"</span> <span class="attr">value</span>=<span class="string">"classpath:some/resource/path/myTemplate.txt"</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"template"</span> <span class="attr">value</span>=<span class="string">"file:///some/resource/path/myTemplate.txt"</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="应用程序上下文和资源路径"><a href="#应用程序上下文和资源路径" class="headerlink" title="应用程序上下文和资源路径"></a>应用程序上下文和资源路径</h2><p>本节介绍如何使用资源创建应用程序上下文，包括使用 XML 的快捷方式，如何使用通配符以及其他详细信息。</p>
+<h3 id="构造应用程序上下文"><a href="#构造应用程序上下文" class="headerlink" title="构造应用程序上下文"></a>构造应用程序上下文</h3><p>应用程序上下文构造函数（针对特定的应用程序上下文类型）通常采用字符串或字符串数 ​​ 组作为资源的位置路径，例如构成上下文定义的 XML 文件。</p>
+<p>当这样的位置路径没有前缀时，从该路径构建并用于加载 Bean 定义的特定 <code>Resource</code> 类型取决于特定应用程序上下文，并且适用于该特定应用程序上下文。 例如，考虑以下示例，该示例创建一个 <code>ClassPathXmlApplicationContext</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ApplicationContext ctx = <span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">"conf/appContext.xml"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>由于使用了 <code>ClassPathResource</code>，因此从类路径中加载了 Bean 定义。 但是，请考虑以下示例，该示例创建一个 <code>FileSystemXmlApplicationContext</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ApplicationContext ctx =</span><br><span class="line">    <span class="keyword">new</span> FileSystemXmlApplicationContext(<span class="string">"conf/appContext.xml"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>现在，bean 定义是从文件系统位置（在这种情况下，是相对于当前工作目录）加载的。</p>
+<p>请注意，在位置路径上使用特殊的类路径前缀或标准 URL 前缀会覆盖为加载定义而创建的默认资源类型。 考虑以下示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ApplicationContext ctx =</span><br><span class="line">    <span class="keyword">new</span> FileSystemXmlApplicationContext(<span class="string">"classpath:conf/appContext.xml"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>使用 <code>FileSystemXmlApplicationContext</code> 从类路径加载 bean 定义。 但是，它仍然是 <code>FileSystemXmlApplicationContext</code>。 如果随后将其用作 <code>ResourceLoader</code>，则任何未前缀的路径仍将视为文件系统路径。</p>
+<h4 id="构造-ClassPathXmlApplicationContext-实例-——-快捷方式"><a href="#构造-ClassPathXmlApplicationContext-实例-——-快捷方式" class="headerlink" title="构造 ClassPathXmlApplicationContext 实例 —— 快捷方式"></a>构造 <code>ClassPathXmlApplicationContext</code> 实例 —— 快捷方式</h4><p><code>ClassPathXmlApplicationContext</code> 公开了许多构造函数以启用方便的实例化。基本思想是，您只能提供一个字符串数组，该字符串数组仅包含 XML 文件本身的文件名（不包含前导路径信息），并且还提供一个 Class。然后，<code>ClassPathXmlApplicationContext</code> 从提供的类中派生路径信息。</p>
+<p>请考虑以下目录布局：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">com/</span><br><span class="line">  foo/</span><br><span class="line">    services.xml</span><br><span class="line">    daos.xml</span><br><span class="line">    MessengerService.class</span><br></pre></td></tr></table></figure>
+
+<p>以下示例显示如何实例化由在名为 <code>service.xml</code> 和 <code>daos.xml</code>（位于类路径中）的文件中定义的 bean 组成的 <code>ClassPathXmlApplicationContext</code> 实例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ApplicationContext ctx = <span class="keyword">new</span> ClassPathXmlApplicationContext(</span><br><span class="line">    <span class="keyword">new</span> String[] &#123;<span class="string">"services.xml"</span>, <span class="string">"daos.xml"</span>&#125;, MessengerService.class);</span><br></pre></td></tr></table></figure>
+
+<p>有关各种构造函数的详细信息，请参见 (<code>ClassPathXmlApplicationContext</code> javadoc)[<a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jca/context/SpringContextResourceAdapter.html]。" target="_blank" rel="noopener">https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jca/context/SpringContextResourceAdapter.html]。</a></p>
+<h3 id="应用程序上下文构造函数资源路径中的通配符"><a href="#应用程序上下文构造函数资源路径中的通配符" class="headerlink" title="应用程序上下文构造函数资源路径中的通配符"></a>应用程序上下文构造函数资源路径中的通配符</h3><p>应用程序上下文构造函数值中的资源路径可以是简单路径（如先前所示），每个路径都具有到目标资源的一对一映射，或者可以包含特殊的<code>classpath*:</code>前缀或内部 Ant 样式的正则表达式（通过使用 Spring 的 <code>PathMatcher</code> 实用程序进行匹配）。后者都是有效的通配符。</p>
+<p>这种机制的一种用途是当您需要进行组件样式的应用程序组装时。所有组件都可以将上下文定义片段“发布”到一个众所周知的位置路径，并且当使用前缀为 <code>classpath*:</code> 的相同路径创建最终应用程序上下文时，所有组件片段都会被自动拾取。</p>
+<p>请注意，此通配符特定于在应用程序上下文构造函数中使用资源路径（或当您直接使用 <code>PathMatcher</code> 实用工具类层次结构时），并且在构造时已解决。它与资源类型本身无关。您不能使用 <code>classpath*:</code> 前缀来构造实际的 <code>Resource</code>，因为资源一次仅指向一个资源。</p>
+<h4 id="Ant-风格模式"><a href="#Ant-风格模式" class="headerlink" title="Ant 风格模式"></a>Ant 风格模式</h4><p>路径位置可以包含 Ant 样式的模式，如以下示例所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/WEB-INF/*-context.xml</span><br><span class="line">com/mycompany/**/applicationContext.xml</span><br><span class="line">file:C:/some/path/*-context.xml</span><br><span class="line">classpath:com/mycompany/**/applicationContext.xml</span><br></pre></td></tr></table></figure>
+
+<p>当路径位置包含 Ant 样式的模式时，解析程序将遵循更复杂的过程来尝试解析通配符。 它为到达最后一个非通配符段的路径生成资源，并从中获取 URL。 如果此 URL 不是 <code>jar:</code> URL 或特定于容器的变体（例如 WebLogic 中的 <code>zip:</code> ，WebSphere 中的 <code>wsjar</code> 等），则从中获取 <code>java.io.File</code> 并将其用于遍历文件系统。 对于 jar URL，解析器可以从中获取 <code>java.net.JarURLConnection</code>，也可以手动解析 jar URL，然后遍历 jar 文件的内容以解析通配符。</p>
+<h5 id="对可移植性的影响"><a href="#对可移植性的影响" class="headerlink" title="对可移植性的影响"></a>对可移植性的影响</h5><p>如果指定的路径已经是一个文件 URL（由于基本 <code>ResourceLoader</code> 是一个文件系统，所以它是隐式的，或者是显式的），则保证通配符可以完全可移植的方式工作。</p>
+<p>如果指定的路径是类路径位置，则解析器必须通过调用 <code>Classloader.getResource()</code>获得最后的非通配符路径段 URL。由于这只是路径的一个节点（而不是末尾的文件），因此实际上（在 <code>ClassLoader</code> javadoc 中）未定义确切返回的是哪种 URL。实际上，它始终是代表目录的 <code>java.io.File</code>（类路径资源在其中解析到文件系统位置）或某种 jar URL（类路径资源在 jar 上解析）。尽管如此，此操作仍存在可移植性问题。</p>
+<p>如果为最后一个非通配符段获取了 jar URL，则解析程序必须能够从中获取 <code>java.net.JarURLConnection</code> 或手动解析 jar URL，以便能够遍历 jar 的内容并解析通配符。这在大多数环境中确实有效，但在其他环境中则无效，因此我们强烈建议您在依赖特定环境之前，对来自 jars 的资源的通配符解析进行彻底测试。</p>
+<h4 id="classpath-前缀"><a href="#classpath-前缀" class="headerlink" title="classpath*: 前缀"></a><code>classpath*:</code> 前缀</h4><p>在构造基于 XML 的应用程序上下文时，位置字符串可以使用特殊的 <code>classpath*:</code> 前缀，如以下示例所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ApplicationContext ctx =</span><br><span class="line">    <span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">"classpath*:conf/appContext.xml"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>这个特殊的前缀指定必须获取与给定名称匹配的所有类路径资源（内部其实是通过调用 <code>ClassLoader.getResources(…)</code> 完成的），然后合并形成最终的应用程序上下文定义。</p>
+<p>通配符类路径依赖于基础类加载器的 <code>getResources()</code> 方法。 由于当今大多数应用程序服务器都提供自己的类加载器实现，因此行为可能有所不同，尤其是在处理 jar 文件时。 检查 <code>classpath*</code> 是否有效的一个简单测试是使用 <code>classloader</code> 从 classpath 的 jar 中加载文件：<code>getClass().getClassLoader().getResources(&quot;&lt;someFileInsideTheJar&gt;&quot;)</code>。 尝试对具有相同名称但位于两个不同位置的文件进行此测试。如果返回了不合适的结果，请检查应用程序服务器文档中可能会影响类加载器行为的设置。</p>
+<p>您还可以在其余位置路径中将 <code>classpath*:</code>前缀与 <code>PathMatcher</code> 模式结合使用（例如，<code>classpath*:META-INF/*-beans.xml</code>）。在这种情况下，解析策略非常简单：在最后一个非通配符路径段上使用 <code>ClassLoader.getResources()</code> 调用，以获取类加载器层次结构中的所有匹配资源，然后从每个资源获取相同的 <code>PathMatcher</code> 解析 前面描述的策略用于通配符子路径。</p>
+<h4 id="有关通配符的其他说明"><a href="#有关通配符的其他说明" class="headerlink" title="有关通配符的其他说明"></a>有关通配符的其他说明</h4><p>请注意，当 <code>classpath*:</code> 与 Ant 样式的模式结合使用时，除非模式文件实际驻留在文件系统中，否则在模式启动之前，它只能与至少一个根目录可靠地一起工作。这意味着诸如 <code>classpath*:*.xml</code> 之类的模式可能不会从 jar 文件的根目录检索文件，而只会从扩展目录的根目录检索文件。</p>
+<p>Spring 检索类路径条目的能力源自 JDK 的 <code>ClassLoader.getResources()</code> 方法，该方法仅返回文件系统中的空字符串位置（指示可能要搜索的根目录）。 Spring 还会评估 jar 文件中的 <code>URLClassLoader</code> 运行时配置和 <code>java.class.path</code> 清单，但这不能保证会导致可移植行为。</p>
+<blockquote>
+<p>扫描类路径包需要在类路径中存在相应的目录条目。使用 Ant 构建 JAR 时，请勿激活 JAR 任务的仅文件开关。此外，在某些环境中，基于安全策略，可能不会公开类路径目录-例如，在 JDK 1.7.0_45 及更高版本上的独立应用程序（要求在清单中设置“受信任的库”。请参阅 <a href="https://stackoverflow.com/questions/19394570/java-jre-7u45-breaks-classloader-getresources）。" target="_blank" rel="noopener">https://stackoverflow.com/questions/19394570/java-jre-7u45-breaks-classloader-getresources）。</a></p>
+<p>在 JDK 9 的模块路径（Jigsaw）上，Spring 的类路径扫描通常可以正常进行。强烈建议在此处将资源放入专用目录，以避免在搜索 jar 文件根目录级别时出现上述可移植性问题。</p>
+</blockquote>
+<p>具有 <code>classpath:</code> 的 Ant 样式模式要搜索的根包如果在多个类路径位置可用，则不能保证资源找到匹配的资源。考虑以下资源位置示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">com/mycompany/package1/service-context.xml</span><br></pre></td></tr></table></figure>
+
+<p>现在考虑某人可能用来尝试找到该文件的 Ant 样式的路径：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classpath:com/mycompany/**/service-context.xml</span><br></pre></td></tr></table></figure>
+
+<p>这样的资源可能只在一个位置，但是当使用诸如上一示例的路径尝试对其进行解析时，解析器将处理 <code>getResource(&quot;com/mycompany&quot;);</code> 返回的（第一个）URL。如果此基本包节点存在于多个类加载器位置，则实际的最终资源可能不存在。因此，在这种情况下，您应该首选使用具有相同 Ant 样式模式的 <code>classpath*:</code>，该模式将搜索包含根包的所有类路径位置。</p>
+<h3 id="FileSystemResource-警告"><a href="#FileSystemResource-警告" class="headerlink" title="FileSystemResource 警告"></a><code>FileSystemResource</code> 警告</h3><p>未附加到 <code>FileSystemApplicationContext</code> 的 <code>FileSystemResource</code>（即，当 <code>FileSystemApplicationContext</code> 不是实际的 <code>ResourceLoader</code> 时）将按您期望的方式处理绝对路径和相对路径。相对路径是相对于当前工作目录的，而绝对路径是相对于文件系统的根的。</p>
+<p>但是，出于向后兼容性（历史）的原因，当 <code>FileSystemApplicationContext</code> 是 <code>ResourceLoader</code> 时，此情况会更改。<code>FileSystemApplicationContext</code> 强制所有附加的 <code>FileSystemResource</code> 实例将所有位置路径都视为相对位置，无论它们是否以前斜杠开头。 实际上，这意味着以下示例是等效的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ApplicationContext ctx =</span><br><span class="line">    <span class="keyword">new</span> FileSystemXmlApplicationContext(<span class="string">"conf/context.xml"</span>);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ApplicationContext ctx =</span><br><span class="line">    <span class="keyword">new</span> FileSystemXmlApplicationContext(<span class="string">"/conf/context.xml"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>以下示例也是等效的（尽管使它们有所不同是有意义的，因为一种情况是相对的，另一种情况是绝对的）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">FileSystemXmlApplicationContext ctx = ...;</span><br><span class="line">ctx.getResource(<span class="string">"some/resource/path/myTemplate.txt"</span>);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">FileSystemXmlApplicationContext ctx = ...;</span><br><span class="line">ctx.getResource(<span class="string">"/some/resource/path/myTemplate.txt"</span>);</span><br></pre></td></tr></table></figure>
+
+<p>在实践中，如果需要真正的绝对文件系统路径，则应避免将绝对路径与 <code>FileSystemResource</code> 或 <code>FileSystemXmlApplicationContext</code> 一起使用，并通过使用 <code>file:</code> URL 前缀来强制使用 <code>UrlResource</code>。以下示例显示了如何执行此操作：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// actual context type doesn't matter, the Resource will always be UrlResource</span></span><br><span class="line">ctx.getResource(<span class="string">"file:///some/resource/path/myTemplate.txt"</span>);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// force this FileSystemXmlApplicationContext to load its definition via a UrlResource</span></span><br><span class="line">ApplicationContext ctx =</span><br><span class="line">    <span class="keyword">new</span> FileSystemXmlApplicationContext(<span class="string">"file:///conf/context.xml"</span>);</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/阅读/" rel="tag">#阅读</a>
+          
+            <a href="/tags/Spring/" rel="tag">#Spring</a>
+          
+            <a href="/tags/Java/" rel="tag">#Java</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/spring-2/" rel="next" title="Spring进阶 - IoC容器(2)">
+                <i class="fa fa-chevron-left"></i> Spring进阶 - IoC容器(2)
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2020/06/spring-3/" data-title="Spring进阶 - 资源" data-url="https://HaleLu.github.io/2020/06/spring-3/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="https://avatars3.githubusercontent.com/u/10864533" alt="Hale Lu">
+          <p class="site-author-name" itemprop="name">Hale Lu</p>
+          <p class="site-description motion-element" itemprop="description">一只欠觉的开发狗</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">34</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">30</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/halelu" target="_blank" title="Github">
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/hao-lu-42-29" target="_blank" title="知乎">
+                  
+                  知乎
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://wpa.qq.com/msgrd?v=3&uin=773622805&site=qq&menu=yes" target="_blank" title="QQ">
+                  
+                  QQ
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa fa-globe fa-fw"></i>
+              各路大神
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://pmextra.github.io/" title="PM Extra's Blog" target="_blank">PM Extra's Blog</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://hzlclock.wordpress.com/" title="Hebert's Blog" target="_blank">Hebert's Blog</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.rexskz.info/" title="Rex's Blog" target="_blank">Rex's Blog</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#资源"><span class="nav-number">1.</span> <span class="nav-text">资源</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">1.1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Resource-接口"><span class="nav-number">1.2.</span> <span class="nav-text">Resource 接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内置-Resource-实现"><span class="nav-number">1.3.</span> <span class="nav-text">内置 Resource 实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#UrlResource"><span class="nav-number">1.3.1.</span> <span class="nav-text">UrlResource</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ClassPathResource"><span class="nav-number">1.3.2.</span> <span class="nav-text">ClassPathResource</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FileSystemResource"><span class="nav-number">1.3.3.</span> <span class="nav-text">FileSystemResource</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ServletContextResource"><span class="nav-number">1.3.4.</span> <span class="nav-text">ServletContextResource</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#InputStreamResource"><span class="nav-number">1.3.5.</span> <span class="nav-text">InputStreamResource</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ByteArrayResource"><span class="nav-number">1.3.6.</span> <span class="nav-text">ByteArrayResource</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ResourceLoader"><span class="nav-number">1.4.</span> <span class="nav-text">ResourceLoader</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ResourceLoaderAware-接口"><span class="nav-number">1.5.</span> <span class="nav-text">ResourceLoaderAware 接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#资源依赖"><span class="nav-number">1.6.</span> <span class="nav-text">资源依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用程序上下文和资源路径"><span class="nav-number">1.7.</span> <span class="nav-text">应用程序上下文和资源路径</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#构造应用程序上下文"><span class="nav-number">1.7.1.</span> <span class="nav-text">构造应用程序上下文</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#构造-ClassPathXmlApplicationContext-实例-——-快捷方式"><span class="nav-number">1.7.1.1.</span> <span class="nav-text">构造 ClassPathXmlApplicationContext 实例 —— 快捷方式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#应用程序上下文构造函数资源路径中的通配符"><span class="nav-number">1.7.2.</span> <span class="nav-text">应用程序上下文构造函数资源路径中的通配符</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Ant-风格模式"><span class="nav-number">1.7.2.1.</span> <span class="nav-text">Ant 风格模式</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#对可移植性的影响"><span class="nav-number">1.7.2.1.1.</span> <span class="nav-text">对可移植性的影响</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#classpath-前缀"><span class="nav-number">1.7.2.2.</span> <span class="nav-text">classpath*: 前缀</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#有关通配符的其他说明"><span class="nav-number">1.7.2.3.</span> <span class="nav-text">有关通配符的其他说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FileSystemResource-警告"><span class="nav-number">1.7.3.</span> <span class="nav-text">FileSystemResource 警告</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hale Lu</span>
+</div>
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="http://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"halelu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      
+      <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+      <script src="/js/src/hook-duoshuo.js"></script>
+    
+  
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';                
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+                            
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').mousedown(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("ABk8fYaVcvf6P6IuuGNY2rRa-gzGzoHsz", "3Vpj3qkDsPj8Rlh92mHOxAMV");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>
