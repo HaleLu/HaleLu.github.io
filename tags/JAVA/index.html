@@ -334,7 +334,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">37</span>
+              <span class="site-state-item-count">38</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -812,7 +812,10 @@
 
 </body>
 </html>
-          var counter = results[0];
+uery.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
             counter.fetchWhenSave(true);
             counter.increment("time");
             counter.save(null, {

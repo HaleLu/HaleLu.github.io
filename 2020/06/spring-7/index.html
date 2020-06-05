@@ -1,0 +1,1031 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="阅读,Spring,Java,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1">
+
+
+
+
+
+
+<meta name="description" content="书接上文 接下来到 Spring framework core 的剩余部分 —— 空指针安全、数据缓冲区和编解码器">
+<meta name="keywords" content="阅读,Spring,Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring进阶 - 空指针安全、数据缓冲区和编解码器">
+<meta property="og:url" content="https://HaleLu.github.io/2020/06/spring-7/index.html">
+<meta property="og:site_name" content="Move your idea forward.">
+<meta property="og:description" content="书接上文 接下来到 Spring framework core 的剩余部分 —— 空指针安全、数据缓冲区和编解码器">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-06-05T10:19:34.593Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring进阶 - 空指针安全、数据缓冲区和编解码器">
+<meta name="twitter:description" content="书接上文 接下来到 Spring framework core 的剩余部分 —— 空指针安全、数据缓冲区和编解码器">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6279916590628603000,
+      author: '（博主大人~）'
+    }
+  };
+</script>
+
+  <title> Spring进阶 - 空指针安全、数据缓冲区和编解码器 | Move your idea forward. </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-77199457-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Move your idea forward.</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Hale Lu's Blog</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Spring进阶 - 空指针安全、数据缓冲区和编解码器
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2020-06-05T21:43:49+08:00" content="2020-06-05">
+              2020-06-05
+            </time>
+          </span>
+
+          
+            <span class="post-category">
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2020/06/spring-7/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/06/spring-7/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+             <span id="/2020/06/spring-7/" class="leancloud_visitors" data-flag-title="Spring进阶 - 空指针安全、数据缓冲区和编解码器">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>书接<a href="https://halelu.github.io/2020/06/spring-6/">上文</a></p>
+<p>接下来到 Spring framework core 的剩余部分 —— 空指针安全、数据缓冲区和编解码器</p>
+<a id="more"></a>
+
+<h1 id="空指针安全"><a href="#空指针安全" class="headerlink" title="空指针安全"></a>空指针安全</h1><p>尽管 Java 不允许您使用其类型系统来表示空指针安全性，但 Spring 框架现在在 <code>org.springframework.lang</code> 包中提供了以下注释，以使您声明 API 和字段的空性：</p>
+<p><code>@Nullable</code>：表示特定参数，返回值或字段可以为 <code>null</code> 的注释。</p>
+<p><code>@NonNull</code>：表示特定参数，返回值或字段不能为 <code>null</code> 的注释（<code>@NonNullApi</code> 和 <code>@NonNullFields</code> 的参数/返回值和字段不需要）。</p>
+<p><code>@NonNullApi</code>：程序包级别的注释，它声明非 <code>null</code> 为参数和返回值的默认语义。</p>
+<p><code>@NonNullFields</code>：程序包级别的注释，它声明非 null 为字段的默认语义。</p>
+<p>Spring 框架本身利用了这些注释，但是它们也可以在任何基于 Spring 的 Java 项目中使用，以声明 null 安全的 API 和可选的 null 安全的字段。尚不支持泛型类型参数，varargs 和数组元素的可空性，但应在即将发布的版本中使用它们，有关最新信息，请参见 <a href="https://jira.spring.io/browse/SPR-15942" target="_blank" rel="noopener">SPR-15942</a>。可空性声明预计将在 Spring Framework 版本之间进行微调，包括次要版本。在方法主体内部使用的类型的可空性超出了此功能的范围。</p>
+<blockquote>
+<p>其他常见的库（如 Reactor 和 Spring Data）提供了使用类似可空性设置的空安全 API，从而为 Spring 应用程序开发人员提供了一致的总体体验。</p>
+</blockquote>
+<h2 id="用例"><a href="#用例" class="headerlink" title="用例"></a>用例</h2><p>除了为 Spring Framework API 可空性提供显式声明外，IDE（例如 IDEA 或 Eclipse）还可以使用这些批注提供与空安全有关的有用警告，以避免在运行时出现 <code>NullPointerException</code>。</p>
+<p>由于 Kotlin 原生支持 null 安全，因此它们还用于在 Kotlin 项目中使 Spring API 为 null 安全。 Kotlin 支持文档中提供了更多详细信息。</p>
+<h2 id="JSR-305-元注释"><a href="#JSR-305-元注释" class="headerlink" title="JSR-305 元注释"></a>JSR-305 元注释</h2><p>Spring 注释使用 JSR 305 注释（静止但广泛使用的 JSR）进行元注释。 JSR-305 元注释使工具供应商（如 IDEA 或 Kotlin）以通用方式提供了空安全支持，而无需对 Spring 注释进行硬编码支持。</p>
+<p>既不需要也不建议向项目类路径添加 JSR-305 依赖项以利用 Spring 空安全 API。只有诸如在其代码库中使用空安全注释的基于 Spring 的库之类的项目，才应添加 <code>com.google.code.findbugs:jsr305:3.0.2</code>（具有 <code>compileOnly</code> Gradle 配置或 Maven <code>provided</code> 的范围），以避免编译警告。</p>
+<h1 id="数据缓冲区和编解码器"><a href="#数据缓冲区和编解码器" class="headerlink" title="数据缓冲区和编解码器"></a>数据缓冲区和编解码器</h1><p>Java NIO 提供了 <code>ByteBuffer</code>，但是许多库在上层构建了自己的字节缓冲区 API，特别是对于网络操作，其中重用缓冲区和/或使用直接缓冲区对性能有利。例如，Netty 具有 <code>ByteBuf</code> 层次结构，Undertow 使用 XNIO，Jetty 使用具有要释放的回调的池化字节缓冲区，等等。<code>spring-core</code> 模块提供了一组抽象，可以与各种字节缓冲区 API 配合使用，如下所示：</p>
+<ul>
+<li><code>DataBufferFactory</code> 抽象数据缓冲区的创建。</li>
+<li><code>DataBuffer</code> 表示一个字节缓冲区，可以将其合并。</li>
+<li><code>DataBufferUtils</code> 提供了用于数据缓冲区的实用程序方法。</li>
+<li>编解码器将流数据缓冲区流解码或编码为更高级别的对象。</li>
+</ul>
+<h2 id="DataBufferFactory"><a href="#DataBufferFactory" class="headerlink" title="DataBufferFactory"></a><code>DataBufferFactory</code></h2><p><code>DataBufferFactory</code> 用于通过以下两种方式之一创建数据缓冲区：</p>
+<ol>
+<li>分配一个新的数据缓冲区，可以选择预先指定容量（如果已知），即使 <code>DataBuffer</code> 的实现可以按需增长和缩小，该容量也会更有效。</li>
+<li>包装一个现有的 <code>byte[]</code> 或 <code>java.nio.ByteBuffer</code>，它们用 <code>DataBuffer</code> 实现装饰给定的数据，并且不涉及分配。</li>
+</ol>
+<p>请注意，WebFlux 应用程序不会直接创建 <code>DataBufferFactory</code>，而是通过客户端的 <code>ServerHttpResponse</code> 或 <code>ClientHttpRequest</code> 访问它。工厂的类型取决于基础客户端或服务器，例如 <code>NettyDataBufferFactory</code> 用于 Reactor Netty，<code>DefaultDataBufferFactory</code> 用于其他。</p>
+<h2 id="DataBuffer"><a href="#DataBuffer" class="headerlink" title="DataBuffer"></a><code>DataBuffer</code></h2><p><code>DataBuffer</code> 接口提供与 <code>java.nio.ByteBuffer</code> 类似的操作，但还带来了一些其他好处，其中一些是受 Netty <code>ByteBuf</code> 启发的。以下是部分好处：</p>
+<ul>
+<li>具有独立位置的读取和写入，即不需要调用 <code>flip()</code> 在读取和写入之间交替。</li>
+<li>与 <code>java.lang.StringBuilder</code> 一样，容量可以按需扩展。</li>
+<li>通过 <code>PooledDataBuffer</code> 进行缓冲池和引用计数。</li>
+<li>将缓冲区作为 <code>java.nio.ByteBuffer</code>，<code>InputStream</code> 或 <code>OutputStream</code> 查看。</li>
+<li>确定给定字节的索引或最后一个索引。</li>
+</ul>
+<h2 id="PooledDataBuffer"><a href="#PooledDataBuffer" class="headerlink" title="PooledDataBuffer"></a><code>PooledDataBuffer</code></h2><p>如 Javadoc 中针对 <code>ByteBuffer</code> 所述，字节缓冲区可以是直接的也可以是非直接的。直接缓冲区可以驻留在 Java 堆之外，从而无需复制本机 I/O 操作。这使得直接缓冲区对于通过套接字接收和发送数据特别有用，但直接创建和释放它们的成本也更高，这导致了缓冲池的想法。</p>
+<p><code>PooledDataBuffer</code> 是 <code>DataBuffer</code> 的扩展，可帮助进行引用计数，这对于字节缓冲区池至关重要。它是如何工作的？分配 <code>PooledDataBuffer</code> 时，引用计数为 1。调用 <code>keep()</code> 会增加计数，而调用 <code>release()</code> 会减少计数。只要计数大于 0，就保证不会释放缓冲区。当计数减少到 0 时，可以释放池中的缓冲区，这实际上意味着将为缓冲区保留的内存返回到内存池。</p>
+<p>请注意，在大多数情况下，与其直接在 <code>PooledDataBuffer</code> 上进行操作，不如在 <code>DataBufferUtils</code> 中使用方便的方法，该方法仅在为 <code>PooledDataBuffer</code> 的实例时才将释放或保留应用于 <code>DataBuffer</code>。</p>
+<p>8.4。 <code>DataBufferUtils</code><br><code>DataBufferUtils</code> 提供了许多实用程序方法来对数据缓冲区进行操作：</p>
+<ul>
+<li>将数据缓冲区流连接到单个缓冲区中，可能具有零个副本，例如通过复合缓冲区（如果基础字节缓冲区 API 支持的话）。</li>
+<li>将 <code>InputStream</code> 或 NIO <code>channel</code> 转换为 <code>Flux&lt;DataBuffer&gt;</code>，反之亦然，将 <code>Publisher&lt;DataBuffer&gt;</code> 转换为 <code>OutputStream</code> 或 NIO <code>channel</code>。</li>
+<li>如果缓冲区是 <code>PooledDataBuffer</code> 的实例，则释放或保留 <code>DataBuffer</code> 的方法。</li>
+<li>从字节流中跳过或获取，直到特定的字节数为止。</li>
+</ul>
+<h2 id="编解码器"><a href="#编解码器" class="headerlink" title="编解码器"></a>编解码器</h2><p>org.springframework.core.codec 包提供以下策略接口：</p>
+<ul>
+<li>Encoder，用于将 <code>Publisher&lt;T&gt;</code> 编码为数据缓冲区流。</li>
+<li>Decoder，用于将 <code>Publisher&lt;DataBuffer&gt;</code> 解码为更高级别的对象流。</li>
+</ul>
+<p><code>spring-core</code> 模块提供 <code>byte[]</code>，<code>ByteBuffer</code>，<code>DataBuffer</code>，<code>Resource</code> 和 <code>String</code> 编码器和解码器实现。<code>spring-web</code> 模块添加了 Jackson JSON，Jackson Smile，JAXB2，Protocol Buffers 和其他编码器和解码器。请参阅 WebFlux 部分中的编解码器。</p>
+<h2 id="使用-DataBuffer"><a href="#使用-DataBuffer" class="headerlink" title="使用 DataBuffer"></a>使用 <code>DataBuffer</code></h2><p>使用数据缓冲区时，必须特别小心以确保释放缓冲区，因为它们可能会被合并。我们将使用编解码器来说明其工作原理，但是这些概念会更普遍地应用。让我们看看编解码器在内部必须执行哪些操作来管理数据缓冲区。</p>
+<p>在创建更高级别的对象之前，<code>Decoder</code> 是最后一个读取输入数据缓冲区的对象，因此，它必须按以下方式释放它们：</p>
+<ol>
+<li>如果 Decoder 只是读取每个输入缓冲区并准备立即释放它，则可以通过 DataBufferUtils.release（dataBuffer）这样做。</li>
+<li>如果 Decoder 使用的是 Flux 或 Mono 运算符（例如 flatMap，reduce 和其他在内部预取和缓存数据项的运算符），或者正在使用诸如 filter，skip 的运算符以及其他遗漏项的运算符，则 doOnDiscard（PooledDataBuffer.class，DataBufferUtils 必须将::: release）添加到组合链中，以确保在丢弃此类缓冲区之前将其释放，这也可能是错误或取消信号的结果。</li>
+<li>如果解码器以任何其他方式保留一个或多个数据缓冲区，则它必须确保在完全读取时释放它们，或者在读取和释放缓存的数据缓冲区之前发生错误或取消信号的情况下。</li>
+</ol>
+<p>请注意，<code>DataBufferUtils#join</code> 提供了一种安全有效的方法来将数据缓冲区流聚合到单个数据缓冲区中。同样，<code>skipUntilByteCount</code> 和 <code>takeUntilByteCount</code> 是供解码器使用的其他安全方法。</p>
+<p><code>Encoder</code> 分配其他人必须读取（和释放）的数据缓冲区。因此，<code>Encoder</code> 无事可做。但是，如果在使用数据填充缓冲区时发生序列化错误，则 <code>Encoder</code> 必须小心释放数据缓冲区。例如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">DataBuffer buffer = factory.allocateBuffer();</span><br><span class="line"><span class="keyword">boolean</span> release = <span class="keyword">true</span>;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// serialize and populate buffer..</span></span><br><span class="line">    release = <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (release) &#123;</span><br><span class="line">        DataBufferUtils.release(buffer);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> buffer;</span><br></pre></td></tr></table></figure>
+
+<p><code>Encoder</code> 的使用者负责释放其接收的数据缓冲区。在 WebFlux 应用程序中，<code>Encoder</code> 的输出用于写入 HTTP 服务器响应或客户端 HTTP 请求，在这种情况下，释放数据缓冲区是写入服务器响应或客户端请求的代码的责任。</p>
+<p>请注意，在 Netty 上运行时，有用于<a href="https://github.com/netty/netty/wiki/Reference-counted-objects#troubleshooting-buffer-leaks" target="_blank" rel="noopener">调试缓冲区泄漏</a>的调试选项。</p>
+
+      
+    </div>
+    
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/阅读/" rel="tag">#阅读</a>
+          
+            <a href="/tags/Spring/" rel="tag">#Spring</a>
+          
+            <a href="/tags/Java/" rel="tag">#Java</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/spring-5/" rel="next" title="Spring进阶 - spring 表达式语言（SpEL）">
+                <i class="fa fa-chevron-left"></i> Spring进阶 - spring 表达式语言（SpEL）
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2020/06/spring-7/" data-title="Spring进阶 - 空指针安全、数据缓冲区和编解码器" data-url="https://HaleLu.github.io/2020/06/spring-7/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="https://avatars3.githubusercontent.com/u/10864533" alt="Hale Lu">
+          <p class="site-author-name" itemprop="name">Hale Lu</p>
+          <p class="site-description motion-element" itemprop="description">一只欠觉的开发狗</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">38</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">30</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/halelu" target="_blank" title="Github">
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/hao-lu-42-29" target="_blank" title="知乎">
+                  
+                  知乎
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://wpa.qq.com/msgrd?v=3&uin=773622805&site=qq&menu=yes" target="_blank" title="QQ">
+                  
+                  QQ
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa fa-globe fa-fw"></i>
+              各路大神
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://pmextra.github.io/" title="PM Extra's Blog" target="_blank">PM Extra's Blog</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://hzlclock.wordpress.com/" title="Hebert's Blog" target="_blank">Hebert's Blog</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.rexskz.info/" title="Rex's Blog" target="_blank">Rex's Blog</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#空指针安全"><span class="nav-number">1.</span> <span class="nav-text">空指针安全</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#用例"><span class="nav-number">1.1.</span> <span class="nav-text">用例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSR-305-元注释"><span class="nav-number">1.2.</span> <span class="nav-text">JSR-305 元注释</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据缓冲区和编解码器"><span class="nav-number">2.</span> <span class="nav-text">数据缓冲区和编解码器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DataBufferFactory"><span class="nav-number">2.1.</span> <span class="nav-text">DataBufferFactory</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DataBuffer"><span class="nav-number">2.2.</span> <span class="nav-text">DataBuffer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PooledDataBuffer"><span class="nav-number">2.3.</span> <span class="nav-text">PooledDataBuffer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编解码器"><span class="nav-number">2.4.</span> <span class="nav-text">编解码器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-DataBuffer"><span class="nav-number">2.5.</span> <span class="nav-text">使用 DataBuffer</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hale Lu</span>
+</div>
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="http://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"halelu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      
+      <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+      <script src="/js/src/hook-duoshuo.js"></script>
+    
+  
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';                
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+                            
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').mousedown(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("ABk8fYaVcvf6P6IuuGNY2rRa-gzGzoHsz", "3Vpj3qkDsPj8Rlh92mHOxAMV");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>
