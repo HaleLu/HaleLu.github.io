@@ -4,10 +4,10 @@
   
     
     <entry>
-      <title><![CDATA[Spring进阶 - 验证、数据绑定和类型转换]]></title>
+      <title><![CDATA[Spring进阶 - spring 表达式语言（SpEL）]]></title>
       <url>https://HaleLu.github.io/2020/06/spring-5/</url>
       <content type="html"><![CDATA[<p>书接<a href="https://halelu.github.io/2020/06/spring-4/">上文</a></p>
-<p>接下来到 Spring framework core 的第四大块 —— 验证、数据绑定和类型转换</p>
+<p>接下来到 Spring framework core 的第四大块 —— spring 表达式语言（SpEL）</p>
 <a id="more"></a>
 
 <h1 id="spring-表达式语言（SpEL）"><a href="#spring-表达式语言（SpEL）" class="headerlink" title="spring 表达式语言（SpEL）"></a>spring 表达式语言（SpEL）</h1><p>Spring 表达式语言（简称“SpEL”）是一种功能强大的表达式语言，支持在运行时查询和操作对象图。语言语法与 Unified EL 相似，但提供了其他功能，最著名的是方法调用和基本的字符串模板功能。</p>
@@ -319,6 +319,34 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.spring.samples.spel.inventor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Society</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String Advisors = <span class="string">"advisors"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String President = <span class="string">"president"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> List&lt;Inventor&gt; members = <span class="keyword">new</span> ArrayList&lt;Inventor&gt;();</span><br><span class="line">    <span class="keyword">private</span> Map officers = <span class="keyword">new</span> HashMap();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List <span class="title">getMembers</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> members;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Map <span class="title">getOfficers</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> officers;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isMember</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (Inventor inventor : members) &#123;</span><br><span class="line">            <span class="keyword">if</span> (inventor.getName().equals(name)) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 ]]></content>
+      
+        <categories>
+            
+            <category> 技术 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 阅读 </tag>
+            
+            <tag> Spring </tag>
+            
+            <tag> Java </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Spring进阶 - Spring AOP APIs]]></title>
+      <url>https://HaleLu.github.io/2020/06/spring-6/</url>
+      <content type="html"><![CDATA[<p>书接<a href="https://halelu.github.io/2020/06/spring-5/">上文</a></p>
+<p>接下来到 Spring framework core 的第五大块 —— AOP</p>
+<a id="more"></a>
+
+<h1 id="Spring-AOP-APIs"><a href="#Spring-AOP-APIs" class="headerlink" title="Spring AOP APIs"></a>Spring AOP APIs</h1>]]></content>
       
         <categories>
             
