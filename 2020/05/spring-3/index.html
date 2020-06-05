@@ -100,7 +100,7 @@
 <meta property="og:site_name" content="Move your idea forward.">
 <meta property="og:description" content="书接上文 接下来到 Spring framework core 的第二大块 —— 资源">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-06-05T03:43:34.627Z">
+<meta property="og:updated_time" content="2020-06-05T10:51:07.619Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spring进阶 - 资源">
 <meta name="twitter:description" content="书接上文 接下来到 Spring framework core 的第二大块 —— 资源">
@@ -496,7 +496,7 @@
 <p>以下示例显示如何实例化由在名为 <code>service.xml</code> 和 <code>daos.xml</code>（位于类路径中）的文件中定义的 bean 组成的 <code>ClassPathXmlApplicationContext</code> 实例：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ApplicationContext ctx = <span class="keyword">new</span> ClassPathXmlApplicationContext(</span><br><span class="line">    <span class="keyword">new</span> String[] &#123;<span class="string">"services.xml"</span>, <span class="string">"daos.xml"</span>&#125;, MessengerService.class);</span><br></pre></td></tr></table></figure>
 
-<p>有关各种构造函数的详细信息，请参见 (<code>ClassPathXmlApplicationContext</code> javadoc)[<a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jca/context/SpringContextResourceAdapter.html]。" target="_blank" rel="noopener">https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jca/context/SpringContextResourceAdapter.html]。</a></p>
+<p>有关各种构造函数的详细信息，请参见 <a href="https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jca/context/SpringContextResourceAdapter.html" target="_blank" rel="noopener"><code>ClassPathXmlApplicationContext</code> javadoc</a>。</p>
 <h3 id="应用程序上下文构造函数资源路径中的通配符"><a href="#应用程序上下文构造函数资源路径中的通配符" class="headerlink" title="应用程序上下文构造函数资源路径中的通配符"></a>应用程序上下文构造函数资源路径中的通配符</h3><p>应用程序上下文构造函数值中的资源路径可以是简单路径（如先前所示），每个路径都具有到目标资源的一对一映射，或者可以包含特殊的<code>classpath*:</code>前缀或内部 Ant 样式的正则表达式（通过使用 Spring 的 <code>PathMatcher</code> 实用程序进行匹配）。后者都是有效的通配符。</p>
 <p>这种机制的一种用途是当您需要进行组件样式的应用程序组装时。所有组件都可以将上下文定义片段“发布”到一个众所周知的位置路径，并且当使用前缀为 <code>classpath*:</code> 的相同路径创建最终应用程序上下文时，所有组件片段都会被自动拾取。</p>
 <p>请注意，此通配符特定于在应用程序上下文构造函数中使用资源路径（或当您直接使用 <code>PathMatcher</code> 实用工具类层次结构时），并且在构造时已解决。它与资源类型本身无关。您不能使用 <code>classpath*:</code> 前缀来构造实际的 <code>Resource</code>，因为资源一次仅指向一个资源。</p>

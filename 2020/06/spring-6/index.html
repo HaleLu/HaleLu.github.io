@@ -102,7 +102,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://docs.spring.io/spring/docs/5.3.0-SNAPSHOT/spring-framework-reference/images/aop-proxy-plain-pojo-call.png">
 <meta property="og:image" content="https://docs.spring.io/spring/docs/5.3.0-SNAPSHOT/spring-framework-reference/images/aop-proxy-call.png">
-<meta property="og:updated_time" content="2020-06-05T10:30:33.586Z">
+<meta property="og:updated_time" content="2020-06-05T11:03:09.376Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spring进阶 - Spring面向切面的编程（AOP）">
 <meta name="twitter:description" content="书接上文 接下来到 Spring framework core 的第五大块 —— AOP">
@@ -408,7 +408,7 @@
 <blockquote>
 <p>Spring 框架的中心宗旨之一是非侵入性。这是一个想法，您不应被迫将特定于框架的类和接口引入业务或域模型。但是，在某些地方，Spring Framework 确实为您提供了将特定于 Spring Framework 的依赖项引入代码库的选项。提供此类选项的理由是，在某些情况下，以这种方式阅读或编码某些特定功能可能会变得更加容易。但是，Spring 框架（几乎）总是为您提供选择：您可以自由地就哪个选项最适合您的特定用例或场景做出明智的决定。</p>
 <p>与本章相关的一种选择是选择哪种 AOP 框架（以及哪种 AOP 样式）。您可以选择 AspectJ 和/或 Spring AOP。您也可以选择 @AspectJ 注释样式方法或 Spring XML 配置样式方法。本章选择首先介绍 @AspectJ 风格的方法这一事实不应被视为表明 Spring 团队比 Spring XML 配置风格更喜欢 @AspectJ 注释风格的方法。</p>
-<p>有关每种样式的“whys and wherefores”的更完整讨论，请参见(选择要使用的 AOP 声明样式)[<a href="https://docs.spring.io/spring/docs/5.3.0-SNAPSHOT/spring-framework-reference/core.html#aop-choosing]。" target="_blank" rel="noopener">https://docs.spring.io/spring/docs/5.3.0-SNAPSHOT/spring-framework-reference/core.html#aop-choosing]。</a></p>
+<p>有关每种样式的“whys and wherefores”的更完整讨论，请参见[选择要使用的 AOP 声明样式](<a href="https://docs.spring.io/spring/docs/5.3.0-SNAPSHOT/spring-framework-reference/core.html#aop-choosing]。" target="_blank" rel="noopener">https://docs.spring.io/spring/docs/5.3.0-SNAPSHOT/spring-framework-reference/core.html#aop-choosing]。</a></p>
 </blockquote>
 <h2 id="AOP-代理"><a href="#AOP-代理" class="headerlink" title="AOP 代理"></a>AOP 代理</h2><p>Spring AOP 默认将标准 JDK 动态代理用于 AOP 代理。这使得可以代理任何接口（或一组接口）。</p>
 <p>Spring AOP 也可以使用 CGLIB 代理。 这对于代理类而不是接口是必需的。默认情况下，如果业务对象未实现接口，则使用 CGLIB。由于对接口而不是对类进行编程是一种好习惯，因此业务类通常实现一个或多个业务接口。在那些需要 advice 在接口上未声明的方法或需要将代理对象作为具体类型传递给方法的情况下（在极少数情况下），可以强制使用 CGLIB。</p>

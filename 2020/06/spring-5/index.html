@@ -100,7 +100,7 @@
 <meta property="og:site_name" content="Move your idea forward.">
 <meta property="og:description" content="书接上文 接下来到 Spring framework core 的第四大块 —— spring 表达式语言（SpEL）">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-06-05T10:30:28.382Z">
+<meta property="og:updated_time" content="2020-06-05T10:49:51.937Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spring进阶 - spring 表达式语言（SpEL）">
 <meta name="twitter:description" content="书接上文 接下来到 Spring framework core 的第四大块 —— spring 表达式语言（SpEL）">
@@ -388,7 +388,7 @@
 <li>集合选择</li>
 <li>模板表达式</li>
 </ul>
-<h2 id="求值"><a href="#求值" class="headerlink" title="求值"></a>求值</h2><p>本节介绍 SpEL 接口及其表达语言的简单用法。 完整的语言参考可以在(“语言参考”)[<a href="https://docs.spring.io/spring/docs/5.3.0-SNAPSHOT/spring-framework-reference/core.html#expressions-language-ref]中找到。" target="_blank" rel="noopener">https://docs.spring.io/spring/docs/5.3.0-SNAPSHOT/spring-framework-reference/core.html#expressions-language-ref]中找到。</a></p>
+<h2 id="求值"><a href="#求值" class="headerlink" title="求值"></a>求值</h2><p>本节介绍 SpEL 接口及其表达语言的简单用法。 完整的语言参考可以在<a href="https://docs.spring.io/spring/docs/5.3.0-SNAPSHOT/spring-framework-reference/core.html#expressions-language-ref" target="_blank" rel="noopener">“语言参考”</a>中找到。</p>
 <p>以下代码介绍了 SpEL API，用于计算文字字符串表达式 <code>Hello World</code>。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ExpressionParser parser = <span class="keyword">new</span> SpelExpressionParser();</span><br><span class="line">Expression exp = parser.parseExpression(<span class="string">"'Hello World'"</span>);</span><br><span class="line">String message = (String) exp.getValue();</span><br></pre></td></tr></table></figure>
 
