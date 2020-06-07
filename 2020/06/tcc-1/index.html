@@ -99,7 +99,7 @@
 <meta property="og:site_name" content="Move your idea forward.">
 <meta property="og:description" content="分布式事务想聊聊分布式事务。 看了网上的一些说法，仔细思考之后感觉都不大统一，有些就是不对。本文加入了一些自己的思考，讨论了一些实现中的细节，如果不对欢迎指正。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-06-07T19:03:33.851Z">
+<meta property="og:updated_time" content="2020-06-07T19:58:46.578Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="分布式事务（1）- 两阶段提交和三阶段提交">
 <meta name="twitter:description" content="分布式事务想聊聊分布式事务。 看了网上的一些说法，仔细思考之后感觉都不大统一，有些就是不对。本文加入了一些自己的思考，讨论了一些实现中的细节，如果不对欢迎指正。">
@@ -343,7 +343,7 @@
 <a id="more"></a>
 
 <p>先说说两阶段和三阶段提交吧。</p>
-<h2 id="两阶段提交"><a href="#两阶段提交" class="headerlink" title="两阶段提交"></a>两阶段提交</h2><p>我这里说的两阶段提交，区别于网络上提到的显然不实用的最简单的两阶段实现，是考虑到超时、异常恢复的两阶段提交。</p>
+<h2 id="两阶段提交"><a href="#两阶段提交" class="headerlink" title="两阶段提交"></a>两阶段提交</h2><p>我这里说的两阶段提交，区别于网络上某些文章里提到的显然不实用的两阶段实现，是考虑到超时、异常恢复的两阶段提交。</p>
 <h3 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h3><p>各系统的所有操作应当保证幂等。</p>
 <h3 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h3><p>具体的流程图不再画（网上随便搜搜就有），简单描述一下就是两步：</p>
 <ol>
