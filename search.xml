@@ -3479,11 +3479,11 @@
         
         <tags>
             
-            <tag> 技术 </tag>
-            
             <tag> .NET </tag>
             
             <tag> C# </tag>
+            
+            <tag> 技术 </tag>
             
         </tags>
         
@@ -4263,9 +4263,9 @@ With the setup described above, the generator will include all API operations in
         
         <tags>
             
-            <tag> 技术 </tag>
-            
             <tag> .NET </tag>
+            
+            <tag> 技术 </tag>
             
             <tag> WCF </tag>
             
@@ -4333,9 +4333,9 @@ With the setup described above, the generator will include all API operations in
         
         <tags>
             
-            <tag> 技术 </tag>
-            
             <tag> .NET </tag>
+            
+            <tag> 技术 </tag>
             
         </tags>
         
