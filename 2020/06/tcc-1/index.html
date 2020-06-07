@@ -76,7 +76,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css">
 
 
-  <meta name="keywords" content="随笔,">
+  <meta name="keywords" content="Move your idea forward">
 
 
 
@@ -92,18 +92,17 @@
 
 
 
-<meta name="description" content="搞了个大新闻。">
-<meta name="keywords" content="随笔">
+<meta name="description" content="分布式事务想聊聊分布式事务。 看了网上的一些说法，仔细思考之后感觉都不大统一，有些就是不对。本文加入了一些自己的思考，讨论了一些实现中的细节，如果不对欢迎指正。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="生活笔记（2016-05-06）">
-<meta property="og:url" content="https://HaleLu.github.io/2016/05/Note-1/index.html">
+<meta property="og:title" content="分布式事务（1）- 两阶段提交和三阶段提交">
+<meta property="og:url" content="https://HaleLu.github.io/2020/06/tcc-1/index.html">
 <meta property="og:site_name" content="Move your idea forward.">
-<meta property="og:description" content="搞了个大新闻。">
+<meta property="og:description" content="分布式事务想聊聊分布式事务。 看了网上的一些说法，仔细思考之后感觉都不大统一，有些就是不对。本文加入了一些自己的思考，讨论了一些实现中的细节，如果不对欢迎指正。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-06-28T05:38:32.156Z">
+<meta property="og:updated_time" content="2020-06-07T19:03:33.851Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="生活笔记（2016-05-06）">
-<meta name="twitter:description" content="搞了个大新闻。">
+<meta name="twitter:title" content="分布式事务（1）- 两阶段提交和三阶段提交">
+<meta name="twitter:description" content="分布式事务想聊聊分布式事务。 看了网上的一些说法，仔细思考之后感觉都不大统一，有些就是不对。本文加入了一些自己的思考，讨论了一些实现中的细节，如果不对欢迎指正。">
 
 
 
@@ -121,7 +120,7 @@
   };
 </script>
 
-  <title> 生活笔记（2016-05-06） | Move your idea forward. </title>
+  <title> 分布式事务（1）- 两阶段提交和三阶段提交 | Move your idea forward. </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -283,7 +282,7 @@
             
             
               
-                生活笔记（2016-05-06）
+                分布式事务（1）- 两阶段提交和三阶段提交
               
             
           </h1>
@@ -295,38 +294,19 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-05-06T18:59:58+08:00" content="2016-05-06">
-              2016-05-06
+            <time itemprop="dateCreated" datetime="2020-06-07T23:11:22+08:00" content="2020-06-07">
+              2020-06-07
             </time>
           </span>
 
-          
-            <span class="post-category">
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/随笔/" itemprop="url" rel="index">
-                    <span itemprop="name">随笔</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
           
 
           
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/05/Note-1/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/Note-1/" itemprop="commentsCount"></span>
+                <a href="/2020/06/tcc-1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/06/tcc-1/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -336,7 +316,7 @@
 
           
           
-             <span id="/2016/05/Note-1/" class="leancloud_visitors" data-flag-title="生活笔记（2016-05-06）">
+             <span id="/2020/06/tcc-1/" class="leancloud_visitors" data-flag-title="分布式事务（1）- 两阶段提交和三阶段提交">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -358,18 +338,78 @@
       
 
       
-        <p>搞了个大新闻。 </p>
-<a id="more"></a> 
+        <h1 id="分布式事务"><a href="#分布式事务" class="headerlink" title="分布式事务"></a>分布式事务</h1><p>想聊聊分布式事务。</p>
+<p>看了网上的一些说法，仔细思考之后感觉都不大统一，有些就是不对。本文加入了一些自己的思考，讨论了一些实现中的细节，如果不对欢迎指正。</p>
+<a id="more"></a>
 
-<h3 id="CCF"><a href="#CCF" class="headerlink" title="CCF"></a>CCF</h3><p>真的是捡了个大便宜吧，莫名其妙就成了 CCF 南航学生分会的主席。  </p>
-<p>一个学会的会旗竟然放在我的柜子里，想想真的是有一点不可思议。  </p>
-<p>肩上的担子重啊。  </p>
-<p>祝我这次真的能做好吧。  </p>
-<p>顺便也重新思考了一下之后的路。开发？科研？好像又开始犹豫了。</p>
-<h3 id="琐事"><a href="#琐事" class="headerlink" title="琐事"></a>琐事</h3><p>终于还是下定决心买了电池，断电后不能用电脑真的很麻烦。  </p>
-<p>这几天事情其实还不算少，下周三的动态规划又该讲了，还有周二晚上要考概率论，周末还得给大一的讲 Android 。  </p>
-<p>其他时间可能会好好复习刷题了。</p>
-<p>祝我顺利。</p>
+<p>先说说两阶段和三阶段提交吧。</p>
+<h2 id="两阶段提交"><a href="#两阶段提交" class="headerlink" title="两阶段提交"></a>两阶段提交</h2><p>我这里说的两阶段提交，区别于网络上提到的显然不实用的最简单的两阶段实现，是考虑到超时、异常恢复的两阶段提交。</p>
+<h3 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h3><p>各系统的所有操作应当保证幂等。</p>
+<h3 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h3><p>具体的流程图不再画（网上随便搜搜就有），简单描述一下就是两步：</p>
+<ol>
+<li><p>发起事务：事务的发起者提出一个请求（比如用户下单购买某个商品），要求其依赖服务（也就是事务的执行者）响应请求（比如通知优惠券业务锁定使用的优惠券、通知支付业务冻结付款金额、通知仓储服务冻结库存等等）<br>当所有依赖方都回复确认之后，事务的准备阶段完毕。</p>
+</li>
+<li><p>确认/取消事务：当请求得到<strong>所有</strong>依赖服务的成功确认后，事务的发起者通知所有执行者确认（confirm）事务；如果第一步中只要有一个执行者返回失败，则取消（cancel）事务。</p>
+</li>
+</ol>
+<blockquote>
+<p>对于第二步，有些文章中的简单的二阶段提交是不需要执行者回复的，个人认为这意味着发起者无法确认第二步事务（无论是 confirm 还是 cancel 操作）有没有成功执行，所以个人认为需要确认。下文按有确认进行讨论。</p>
+<p>更进一步，对于执行者而言，因为第一步的锁定返回了成功，所以第二步的确认只能是成功，不允许失败。执行者应想办法重试并保证成功。如果失败则意味着出现了系统的数据不一致。</p>
+</blockquote>
+<h3 id="超时处理"><a href="#超时处理" class="headerlink" title="超时处理"></a>超时处理</h3><p>以上的流程在是理想情况下。</p>
+<p>当考虑到网络异常等情况，会存在三个问题：</p>
+<ol>
+<li><p>对执行者而言：如果没有收到第二步事务，该如何处理？此时的执行者会一直锁定资源等待第二步事务。</p>
+</li>
+<li><p>对发起者而言：如果第一步中没有收到回复，该如果处理？此时的发起者无法得知是否所有执行者都成功锁定了资源。</p>
+</li>
+<li><p>对发起者而言：如果第二步中没有收到回复，该如果处理？此时的发起者无法得知是否所有执行者都成功确认了事务。</p>
+</li>
+</ol>
+<blockquote>
+<p>执行者没有收到第一步事务，对执行者而言是无感知的。所以没有这个问题。</p>
+</blockquote>
+<p>依次回答这三个问题：</p>
+<ol>
+<li><p>执行者没有收到第二步事务，有三种处理方案：第一种是一直锁定资源等待，第二种是超时 confirm 事务，第三种是超时 cancel 事务。对于两阶段提交而言，其他执行者在第一步是有可能返回失败的，所以显然强行 confirm 会有风险，第三种更为合理。此处有“应当 confirm 但因为网络或其他问题而没有收到，最终执行了超时 cancel”的风险，会导致数据不一致。</p>
+</li>
+<li><p>发起者第一步中没有收到回复，也存在两种策略：要么超时重试（再次提出事务），要么超时后当做返回失败处理。这两种可以组合使用，即多次超时重试后仍无回复则当做返回失败处理。</p>
+</li>
+<li><p>发起者第二步中没有收到回复，和问题 2 的处理策略类似，多次超时重试后仍无返回说明出现了异常，但不同的是这个异常是一个无法回滚的异常，意味着系统中可能出现了数据不一致，可能需要其他（很可能是人工）方式修复数据。</p>
+</li>
+</ol>
+<blockquote>
+<p>对于问题 3 ，因为在问题 1 的回答中我们默认执行者超时会 cancel 事务，所以当发起者第二步提出的是 cancel 时不会有什么问题。换句话说，当发起者在第二步提出 confirm 而没有收到回复时可能会出现数据不一致。</p>
+</blockquote>
+<h3 id="异常重试"><a href="#异常重试" class="headerlink" title="异常重试"></a>异常重试</h3><p>当执行过程中发生异常（比如宕机），事务应当可以重试。</p>
+<ol>
+<li><p>对发起者而言：如果在第一步发生异常：部分执行者锁定了资源，而另一部分从未收到过事务请求。由于执行者会默认超时 cancel，所以发起者发起 cancel 后（或不处理，直接等待超时）重新发起新事务即可。</p>
+</li>
+<li><p>对发起者而言：如果在第二步发生异常：如果执行的是 cancel，则无需重试，当做成功即可（当然也可以重试）。如果执行的是 confirm，则可能发生部分机器成功 confirm，部分机器由于没有收到 confirm，默认超时 cancel 请求，从而数据不一致的风险。</p>
+</li>
+<li><p>对执行者而言：如果在第一步发生异常：尽量返回失败即可，超时发起者会重试/cancel 请求。不会有什么风险。</p>
+</li>
+<li><p>对执行者而言：如果在第二步发生异常：尽量重试并保证成功。如果执行的是 confirm，说明第一步的锁定返回了成功，所以第二步的确认只能是成功。如果是 cancel，则更应当自行重试保证资源释放。</p>
+</li>
+</ol>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>在思考前两章问题的过程中，我们意识到了这个流程所存在的问题：</p>
+<ol>
+<li><p>最严重的风险，如果发起者在第二步 confirm 的过程中出现了异常、或由于网络问题部分执行者没有收到 confirm，那么会出现数据不一致的问题。</p>
+</li>
+<li><p>第一步操作会锁定资源，然而有可能操作不成功，需要释放资源。这种反复的“锁定-释放”降低了并发。</p>
+</li>
+</ol>
+<h2 id="三阶段提交"><a href="#三阶段提交" class="headerlink" title="三阶段提交"></a>三阶段提交</h2><h3 id="相对两阶段提交的改进"><a href="#相对两阶段提交的改进" class="headerlink" title="相对两阶段提交的改进"></a>相对两阶段提交的改进</h3><p>名词上的修改没太多意义（cancel -&gt; rollback，confirm -&gt; doCommit）</p>
+<p>三阶段提交在两阶段提交上的改进就是在之前多了一步：</p>
+<p>在锁定资源之前先进行查询，确认是否可提交。我们暂时将其称之为第 0 步。</p>
+<p>好处是什么？</p>
+<p>还是以之前“用户下单购买某个商品”为例。对于这个场景，第 0 步会检查向优惠券服务检查优惠券是否可用、向支付业务检查账户余额是否足够、向仓储服务检查库存是否足够等。</p>
+<p>只有当第 0 步全部返回成功时，才会执行第一步的锁定资源。这时的第一步也几乎可以全部返回成功（只有并发情况下会失败）。</p>
+<p>因此，对于执行者而言，如果一直没有收到第二步（实际上的第三步）的事务，超时可以默认执行 confirm 操作。大多数情况下都会成功避免数据不一致。（只有并发竞争情况下有可能失败）</p>
+<p>简而言之，三阶段提交相比两阶段提交多了第 0 步检查是否可提交。执行者的默认超时行为从 cancel 改为 confirm。</p>
+<h3 id="总结三阶段提交"><a href="#总结三阶段提交" class="headerlink" title="总结三阶段提交"></a>总结三阶段提交</h3><p>我们可以看到，三阶段提交的确成功提高了并发，降低了反复的“锁定-释放”的可能。</p>
+<p>然而他并没有完全解决二阶段提交数据不一致的问题，只是极大概率避免了数据不一致的可能性。在极端情况下：由于高并发，多个请求同时通过了第 0 步检查，部分却在第 1 步锁定失败，本应 cancel 却因为网络或其他问题导致部分（或全部）执行者没有收到 cancel 命令默认 confirm 了事务，导致了数据不一致。</p>
+<p>下一章聊聊 TCC。</p>
 
       
     </div>
@@ -388,28 +428,18 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/随笔/" rel="tag">#随笔</a>
-          
-        </div>
-      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/05/Test-for-EF-Whether-Shared-Object-When-Having-the-Same-Foreign-Keys/" rel="next" title="EF 测试：不同对象的同一外键是否指向同一对象">
-                <i class="fa fa-chevron-left"></i> EF 测试：不同对象的同一外键是否指向同一对象
+              <a href="/2020/06/spring-7/" rel="next" title="Spring进阶 - 空指针安全、数据缓冲区和编解码器">
+                <i class="fa fa-chevron-left"></i> Spring进阶 - 空指针安全、数据缓冲区和编解码器
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/05/Android-Intro/" rel="prev" title="Android Intro">
-                Android Intro <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -438,7 +468,7 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/05/Note-1/" data-title="生活笔记（2016-05-06）" data-url="https://HaleLu.github.io/2016/05/Note-1/">
+      <div class="ds-thread" data-thread-key="2020/06/tcc-1/" data-title="分布式事务（1）- 两阶段提交和三阶段提交" data-url="https://HaleLu.github.io/2020/06/tcc-1/">
       </div>
     
   </div>
@@ -572,7 +602,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#CCF"><span class="nav-number">1.</span> <span class="nav-text">CCF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#琐事"><span class="nav-number">2.</span> <span class="nav-text">琐事</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#分布式事务"><span class="nav-number">1.</span> <span class="nav-text">分布式事务</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#两阶段提交"><span class="nav-number">1.1.</span> <span class="nav-text">两阶段提交</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前提"><span class="nav-number">1.1.1.</span> <span class="nav-text">前提</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#流程"><span class="nav-number">1.1.2.</span> <span class="nav-text">流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#超时处理"><span class="nav-number">1.1.3.</span> <span class="nav-text">超时处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异常重试"><span class="nav-number">1.1.4.</span> <span class="nav-text">异常重试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题"><span class="nav-number">1.1.5.</span> <span class="nav-text">问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三阶段提交"><span class="nav-number">1.2.</span> <span class="nav-text">三阶段提交</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#相对两阶段提交的改进"><span class="nav-number">1.2.1.</span> <span class="nav-text">相对两阶段提交的改进</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结三阶段提交"><span class="nav-number">1.2.2.</span> <span class="nav-text">总结三阶段提交</span></a></li></ol></li></ol></li></ol></div>
             
           </div>
         </section>
