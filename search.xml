@@ -4,7 +4,120 @@
   
     
     <entry>
-      <title><![CDATA[分布式事务（1）- 两阶段提交和三阶段提交]]></title>
+      <title><![CDATA[Spring Cache 源码分析]]></title>
+      <url>https://HaleLu.github.io/2020/06/spring-cache/</url>
+      <content type="html"><![CDATA[<p>最近想写批量操作的缓存 AOP，于是研究了一下 Spring 原生的 Cache 源码，以便编些自己的 BatchCache AOP。</p>
+<a id="more"></a>
+
+<h1 id="Spring-Cache"><a href="#Spring-Cache" class="headerlink" title="Spring Cache"></a>Spring Cache</h1><h2 id="配置-Configuration"><a href="#配置-Configuration" class="headerlink" title="配置(Configuration)"></a>配置(Configuration)</h2><h3 id="基类：AbstractCachingConfiguration"><a href="#基类：AbstractCachingConfiguration" class="headerlink" title="基类：AbstractCachingConfiguration"></a>基类：AbstractCachingConfiguration</h3><p>包含几个关键配置对象可供配置：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> AnnotationAttributes enableCaching;</span><br><span class="line"><span class="keyword">protected</span> CacheManager cacheManager;</span><br><span class="line"><span class="keyword">protected</span> CacheResolver cacheResolver;</span><br><span class="line"><span class="keyword">protected</span> KeyGenerator keyGenerator;</span><br><span class="line"><span class="keyword">protected</span> CacheErrorHandler errorHandler;</span><br></pre></td></tr></table></figure>
+
+<h3 id="入口配置：ProxyCachingConfiguration"><a href="#入口配置：ProxyCachingConfiguration" class="headerlink" title="入口配置：ProxyCachingConfiguration"></a>入口配置：ProxyCachingConfiguration</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span>(name = CacheManagementConfigUtils.CACHE_ADVISOR_BEAN_NAME)</span><br><span class="line"><span class="meta">@Role</span>(BeanDefinition.ROLE_INFRASTRUCTURE)</span><br><span class="line"><span class="function"><span class="keyword">public</span> BeanFactoryCacheOperationSourceAdvisor <span class="title">cacheAdvisor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    BeanFactoryCacheOperationSourceAdvisor advisor = <span class="keyword">new</span> BeanFactoryCacheOperationSourceAdvisor();</span><br><span class="line">    advisor.setCacheOperationSource(cacheOperationSource());</span><br><span class="line">    advisor.setAdvice(cacheInterceptor());</span><br><span class="line">    advisor.setOrder(<span class="keyword">this</span>.enableCaching.&lt;Integer&gt;getNumber(<span class="string">"order"</span>));</span><br><span class="line">    <span class="keyword">return</span> advisor;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="meta">@Role</span>(BeanDefinition.ROLE_INFRASTRUCTURE)</span><br><span class="line"><span class="function"><span class="keyword">public</span> CacheOperationSource <span class="title">cacheOperationSource</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> AnnotationCacheOperationSource();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="meta">@Role</span>(BeanDefinition.ROLE_INFRASTRUCTURE)</span><br><span class="line"><span class="function"><span class="keyword">public</span> CacheInterceptor <span class="title">cacheInterceptor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    CacheInterceptor interceptor = <span class="keyword">new</span> CacheInterceptor();</span><br><span class="line">    interceptor.setCacheOperationSources(cacheOperationSource());</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.cacheResolver != <span class="keyword">null</span>) &#123;</span><br><span class="line">        interceptor.setCacheResolver(<span class="keyword">this</span>.cacheResolver);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">this</span>.cacheManager != <span class="keyword">null</span>) &#123;</span><br><span class="line">        interceptor.setCacheManager(<span class="keyword">this</span>.cacheManager);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.keyGenerator != <span class="keyword">null</span>) &#123;</span><br><span class="line">        interceptor.setKeyGenerator(<span class="keyword">this</span>.keyGenerator);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.errorHandler != <span class="keyword">null</span>) &#123;</span><br><span class="line">        interceptor.setErrorHandler(<span class="keyword">this</span>.errorHandler);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> interceptor;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="注解解析器-Annotation-Parser"><a href="#注解解析器-Annotation-Parser" class="headerlink" title="注解解析器(Annotation Parser)"></a>注解解析器(Annotation Parser)</h2><h3 id="CacheAnnotationParser-接口"><a href="#CacheAnnotationParser-接口" class="headerlink" title="CacheAnnotationParser 接口"></a>CacheAnnotationParser 接口</h3><p>包含两个方法的声明。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">CacheAnnotationParser</span> </span>&#123;</span><br><span class="line">    <span class="function">Collection&lt;CacheOperation&gt; <span class="title">parseCacheAnnotations</span><span class="params">(Class&lt;?&gt; type)</span></span>;</span><br><span class="line">    <span class="function">Collection&lt;CacheOperation&gt; <span class="title">parseCacheAnnotations</span><span class="params">(Method method)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>能够将 class 或 method 的 cache 注解解析为 <code>CacheOperation</code> 操作。</p>
+<h3 id="SpringCacheAnnotationParser-类"><a href="#SpringCacheAnnotationParser-类" class="headerlink" title="SpringCacheAnnotationParser 类"></a>SpringCacheAnnotationParser 类</h3><p><code>SpringCacheAnnotationParser</code> 实现了 <code>CacheAnnotationParser</code>。同时还实现了 <code>Serializable</code>。</p>
+<p>两个 <code>parseCacheAnnotations</code> 方法的内部实现，都是首先通过 <code>getDefaultCacheConfig(type)</code>（对于 <code>method</code>，参数取 <code>method.getDeclaringClass()</code>）取一个默认的 cache 配置，然后走同一套 <code>parseCacheAnnotations(defaultConfig, type)</code> 逻辑。</p>
+<p>基本上调用方只有 <code>AnnotationCacheOperationSource</code>。</p>
+<h4 id="parseCacheAnnotations"><a href="#parseCacheAnnotations" class="headerlink" title="parseCacheAnnotations"></a>parseCacheAnnotations</h4><p>通过 <code>getAllMergedAnnotations</code> 方法，将类型（<code>Class&lt;?&gt;</code> 或 <code>Method</code>）的 <code>Cacheable</code>、<code>CacheEvict</code>、<code>CachePut</code>、<code>Caching</code> 注解分别取出，分别通过 <code>parseCacheableAnnotation</code>、<code>parseEvictAnnotation</code>、<code>parsePutAnnotation</code>、<code>parseCachingAnnotation</code>方法解析为成 CacheOperation，最终合并为一个集合。</p>
+<p>前三个 parseXXXAnnotation 的方法基本类似，取出注解中的参数（name、cacheName、key 等等，前三个注解略有不同），与 defaultConfig 合并，校验参数并返回。<code>parseCachingAnnotation</code> 是前三个注解的组合注解，所以将其内部的三种分别取出，再执行前三个 parseXXXAnnotation 方法。代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">CacheableOperation <span class="title">parseCacheableAnnotation</span><span class="params">(AnnotatedElement ae, DefaultCacheConfig defaultConfig, Cacheable cacheable)</span> </span>&#123;</span><br><span class="line">    CacheableOperation.Builder builder = <span class="keyword">new</span> CacheableOperation.Builder();</span><br><span class="line"></span><br><span class="line">    builder.setName(ae.toString());</span><br><span class="line">    builder.setCacheNames(cacheable.cacheNames());</span><br><span class="line">    builder.setCondition(cacheable.condition());</span><br><span class="line">    builder.setUnless(cacheable.unless());</span><br><span class="line">    builder.setKey(cacheable.key());</span><br><span class="line">    builder.setKeyGenerator(cacheable.keyGenerator());</span><br><span class="line">    builder.setCacheManager(cacheable.cacheManager());</span><br><span class="line">    builder.setCacheResolver(cacheable.cacheResolver());</span><br><span class="line">    builder.setSync(cacheable.sync());</span><br><span class="line"></span><br><span class="line">    defaultConfig.applyDefault(builder);</span><br><span class="line">    CacheableOperation op = builder.build();</span><br><span class="line">    validateCacheOperation(ae, op);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> op;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">CacheEvictOperation <span class="title">parseEvictAnnotation</span><span class="params">(AnnotatedElement ae, DefaultCacheConfig defaultConfig, CacheEvict cacheEvict)</span> </span>&#123;</span><br><span class="line">    CacheEvictOperation.Builder builder = <span class="keyword">new</span> CacheEvictOperation.Builder();</span><br><span class="line"></span><br><span class="line">    builder.setName(ae.toString());</span><br><span class="line">    builder.setCacheNames(cacheEvict.cacheNames());</span><br><span class="line">    builder.setCondition(cacheEvict.condition());</span><br><span class="line">    builder.setKey(cacheEvict.key());</span><br><span class="line">    builder.setKeyGenerator(cacheEvict.keyGenerator());</span><br><span class="line">    builder.setCacheManager(cacheEvict.cacheManager());</span><br><span class="line">    builder.setCacheResolver(cacheEvict.cacheResolver());</span><br><span class="line">    builder.setCacheWide(cacheEvict.allEntries());</span><br><span class="line">    builder.setBeforeInvocation(cacheEvict.beforeInvocation());</span><br><span class="line"></span><br><span class="line">    defaultConfig.applyDefault(builder);</span><br><span class="line">    CacheEvictOperation op = builder.build();</span><br><span class="line">    validateCacheOperation(ae, op);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> op;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">CacheOperation <span class="title">parsePutAnnotation</span><span class="params">(AnnotatedElement ae, DefaultCacheConfig defaultConfig, CachePut cachePut)</span> </span>&#123;</span><br><span class="line">    CachePutOperation.Builder builder = <span class="keyword">new</span> CachePutOperation.Builder();</span><br><span class="line"></span><br><span class="line">    builder.setName(ae.toString());</span><br><span class="line">    builder.setCacheNames(cachePut.cacheNames());</span><br><span class="line">    builder.setCondition(cachePut.condition());</span><br><span class="line">    builder.setUnless(cachePut.unless());</span><br><span class="line">    builder.setKey(cachePut.key());</span><br><span class="line">    builder.setKeyGenerator(cachePut.keyGenerator());</span><br><span class="line">    builder.setCacheManager(cachePut.cacheManager());</span><br><span class="line">    builder.setCacheResolver(cachePut.cacheResolver());</span><br><span class="line"></span><br><span class="line">    defaultConfig.applyDefault(builder);</span><br><span class="line">    CachePutOperation op = builder.build();</span><br><span class="line">    validateCacheOperation(ae, op);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> op;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">Collection&lt;CacheOperation&gt; <span class="title">parseCachingAnnotation</span><span class="params">(AnnotatedElement ae, DefaultCacheConfig defaultConfig, Caching caching)</span> </span>&#123;</span><br><span class="line">    Collection&lt;CacheOperation&gt; ops = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    Cacheable[] cacheables = caching.cacheable();</span><br><span class="line">    <span class="keyword">if</span> (!ObjectUtils.isEmpty(cacheables)) &#123;</span><br><span class="line">        ops = lazyInit(ops);</span><br><span class="line">        <span class="keyword">for</span> (Cacheable cacheable : cacheables) &#123;</span><br><span class="line">            ops.add(parseCacheableAnnotation(ae, defaultConfig, cacheable));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    CacheEvict[] cacheEvicts = caching.evict();</span><br><span class="line">    <span class="keyword">if</span> (!ObjectUtils.isEmpty(cacheEvicts)) &#123;</span><br><span class="line">        ops = lazyInit(ops);</span><br><span class="line">        <span class="keyword">for</span> (CacheEvict cacheEvict : cacheEvicts) &#123;</span><br><span class="line">            ops.add(parseEvictAnnotation(ae, defaultConfig, cacheEvict));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    CachePut[] cachePuts = caching.put();</span><br><span class="line">    <span class="keyword">if</span> (!ObjectUtils.isEmpty(cachePuts)) &#123;</span><br><span class="line">        ops = lazyInit(ops);</span><br><span class="line">        <span class="keyword">for</span> (CachePut cachePut : cachePuts) &#123;</span><br><span class="line">            ops.add(parsePutAnnotation(ae, defaultConfig, cachePut));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> ops;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>最终校验 <code>CacheableOperation</code> 时，key 和 keyGenerator 至少需要有一个定义，cacheManager 和 cacheResolver 至少需要有一个定义。</p>
+</blockquote>
+<h2 id="缓存操作源"><a href="#缓存操作源" class="headerlink" title="缓存操作源"></a>缓存操作源</h2><h3 id="CacheOperationSource-接口"><a href="#CacheOperationSource-接口" class="headerlink" title="CacheOperationSource 接口"></a>CacheOperationSource 接口</h3><p>只定义了一个方法，用于获取 CacheOperation 集合</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Collection&lt;CacheOperation&gt; <span class="title">getCacheOperations</span><span class="params">(Method method, Class&lt;?&gt; targetClass)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="AbstractFallbackCacheOperationSource"><a href="#AbstractFallbackCacheOperationSource" class="headerlink" title="AbstractFallbackCacheOperationSource"></a>AbstractFallbackCacheOperationSource</h3><p>做了一层缓存。</p>
+<p>由 <code>computeCacheOperations(Method method, Class&lt;?&gt; targetClass)</code> 计算 CacheOperation 集合。</p>
+<p>取 class 的 CacheConfig 注解作为 <code>DefaultCacheConfig</code>，没有则全为 null。</p>
+<blockquote>
+<p>也就是说，Method 的 CacheConfig 定义需要在声明它的 class 上。</p>
+</blockquote>
+<h4 id="computeCacheOperations-方法"><a href="#computeCacheOperations-方法" class="headerlink" title="computeCacheOperations 方法"></a>computeCacheOperations 方法</h4><p>方法声明为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Collection&lt;CacheOperation&gt; <span class="title">computeCacheOperations</span><span class="params">(Method method, Class&lt;?&gt; targetClass)</span></span></span><br></pre></td></tr></table></figure>
+
+<p>首先，如果需要的话，过滤只考虑 public 方法。（默认需要过滤）</p>
+<p>其次，通过 <code>ClassUtils.getMostSpecificMethod</code> 和 <code>BridgeMethodResolver.findBridgedMethod</code> 找到最合适的 method 定义。</p>
+<blockquote>
+<p>桥接方法是为了兼容 Java 1.5 没有泛型语义时允许传递 Object 的问题而由编译器自动生成的方法。</p>
+</blockquote>
+<p>先使用 <code>findCacheOperations(Class&lt;?&gt; clazz)</code> 尝试从方法上解析 cache 操作，有则直接返回。没有则尝试使用 <code>findCacheOperations(Method method)</code> 从定义方法的类上解析，有则直接返回。</p>
+<p>都取不到则尝试从原方法上用相同的流程解析。</p>
+<p>都解析不到则返回 null。</p>
+<h3 id="AnnotationCacheOperationSource-类"><a href="#AnnotationCacheOperationSource-类" class="headerlink" title="AnnotationCacheOperationSource 类"></a>AnnotationCacheOperationSource 类</h3><p><code>AnnotationCacheOperationSource</code> 继承了 <code>AbstractFallbackCacheOperationSource</code> 并实现了 <code>Serializable</code>。</p>
+<p>AnnotationCacheOperationSource 会读取 Spring 的 <code>Cacheable</code>、 <code>CachePut</code> 和 <code>CacheEvict</code> 批注，并将相应的 cache operation 定义公开给 Spring 的缓存基础结构。此类也可以用作自定义 CacheOperationSource 的基类。</p>
+<p>内部定义了一个 <code>Set&lt;CacheAnnotationParser&gt; annotationParsers</code> 保存用到的注解分析器。</p>
+<p>提供了自定义是否只使用 public 方法和自定义缓存注解解析器（<code>CacheAnnotationParser</code>）的构造方法。默认只解析 public 方法，且解析器集合只有上文提到的 <code>SpringCacheAnnotationParser</code>。</p>
+<p><code>determineCacheOperations(provider)</code> 确定给定 <code>CacheOperationProvider</code> 的 <code>CacheOperation</code>。该实现委托配置的 <code>CacheAnnotationParser</code>（默认为 SpringCacheAnnotationParser）来将已知的注解解析为 Spring 的元 attribute 类。可以重写以支持带有 caching metadata 的自定义注解。参数 <code>provider</code> 是要使用的 cache operation 提供者，类型为 <code>CacheOperationProvider</code>。</p>
+<p>定义了基类使用的 <code>findCacheOperations</code> 方法，实现是遍历所有 <code>annotationParsers</code>，调用其 <code>parseCacheAnnotations</code>，然后将 cache 操作合并为一个 set。</p>
+<h3 id="CacheOperationSource-用法小结"><a href="#CacheOperationSource-用法小结" class="headerlink" title="CacheOperationSource 用法小结"></a>CacheOperationSource 用法小结</h3><p>这个类，最终对外提供的是定义在 <code>AbstractFallbackCacheOperationSource</code> 下的 <code>getCacheOperations(Method method, Class&lt;?&gt; targetClass)</code> 方法。用于 <code>CacheAspectSupport</code> 和 <code>CacheOperationSourcePointcut</code>。</p>
+<h2 id="Pointcut"><a href="#Pointcut" class="headerlink" title="Pointcut"></a>Pointcut</h2><h3 id="与-Cache-无关的-AOP-基类"><a href="#与-Cache-无关的-AOP-基类" class="headerlink" title="与 Cache 无关的 AOP 基类"></a>与 Cache 无关的 AOP 基类</h3><p>StaticMethodMatcherPointcut -&gt; Pointcut<br>StaticMethodMatcherPointcut -&gt; StaticMethodMatcher -&gt; MethodMatcher</p>
+<h3 id="CacheOperationSourcePointcut"><a href="#CacheOperationSourcePointcut" class="headerlink" title="CacheOperationSourcePointcut"></a>CacheOperationSourcePointcut</h3><p>是一个抽象类，继承自 StaticMethodMatcherPointcut，实现了 Serializable。</p>
+<p>有一个待实现的 <code>getCacheOperationSource</code> 方法，以返回缓存操作源。</p>
+<p>实现了基类的 match 方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">matches</span><span class="params">(Method method, Class&lt;?&gt; targetClass)</span> </span>&#123;</span><br><span class="line">    CacheOperationSource cas = getCacheOperationSource();</span><br><span class="line">    <span class="keyword">return</span> (cas != <span class="keyword">null</span> &amp;&amp; !CollectionUtils.isEmpty(cas.getCacheOperations(method, targetClass)));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>也就是说，如果 <code>cacheOperationSource</code> 非空且 <code>cacheOperationSource.getCacheOperations(method, targetClass)</code> 取到了一个或多个 cache 操作则可以匹配上。</p>
+<h2 id="缓存操作的调用上下文-CacheOperationInvocationContext"><a href="#缓存操作的调用上下文-CacheOperationInvocationContext" class="headerlink" title="缓存操作的调用上下文 CacheOperationInvocationContext"></a>缓存操作的调用上下文 CacheOperationInvocationContext</h2><p>缓存操作的调用上下文类，提供四个接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">CacheOperationInvocationContext</span>&lt;<span class="title">O</span> <span class="keyword">extends</span> <span class="title">BasicOperation</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function">O <span class="title">getOperation</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">Object <span class="title">getTarget</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">Method <span class="title">getMethod</span><span class="params">()</span></span>;</span><br><span class="line">    Object[] getArgs();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>泛型的基类定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BasicOperation</span> </span>&#123;</span><br><span class="line">    <span class="function">Set&lt;String&gt; <span class="title">getCacheNames</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="缓存解析器-cache-resolver"><a href="#缓存解析器-cache-resolver" class="headerlink" title="缓存解析器(cache resolver)"></a>缓存解析器(cache resolver)</h2><h3 id="CacheResolver"><a href="#CacheResolver" class="headerlink" title="CacheResolver"></a>CacheResolver</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">CacheResolver</span> </span>&#123;</span><br><span class="line">    Collection&lt;? extends Cache&gt; resolveCaches(CacheOperationInvocationContext&lt;?&gt; context);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="AbstractCacheResolver、SimpleCacheResolver-和-NamedCacheResolver"><a href="#AbstractCacheResolver、SimpleCacheResolver-和-NamedCacheResolver" class="headerlink" title="AbstractCacheResolver、SimpleCacheResolver 和 NamedCacheResolver"></a>AbstractCacheResolver、SimpleCacheResolver 和 NamedCacheResolver</h3><p>抽象类，实现了 CacheResolver 接口，框架提供了两个默认实现 SimpleCacheResolver 和 NamedCacheResolver。</p>
+<p>区别在于 SimpleCacheResolver 取 Operation 上的 cacheNames，NamedCacheResolver 手动指定 cacheNames。</p>
+<p>而后都遍历 cacheNames 执行 CacheManager.getCache(cacheName) 并整合至同一集合并返回。</p>
+<h3 id="CacheResolver-用法小结"><a href="#CacheResolver-用法小结" class="headerlink" title="CacheResolver 用法小结"></a>CacheResolver 用法小结</h3><p>对外提供了 resolveCaches 方法，主要用在 <code>CacheAspectSupport</code>。</p>
+<h2 id="Interceptor-拦截器"><a href="#Interceptor-拦截器" class="headerlink" title="Interceptor 拦截器"></a>Interceptor 拦截器</h2><h3 id="AbstractCacheInvoker"><a href="#AbstractCacheInvoker" class="headerlink" title="AbstractCacheInvoker"></a>AbstractCacheInvoker</h3><p>在基本的 <code>Cache</code> 类的 doGet、doPut、doEvict 方法外包了一层 try-catch 并定义了异常日志的打印方式。默认直接抛出异常。</p>
+<h3 id="CacheAspectSupport"><a href="#CacheAspectSupport" class="headerlink" title="CacheAspectSupport"></a>CacheAspectSupport</h3><p>抽象类，CacheAspectSupport 继承自 AbstractCacheInvoker，还实现了 BeanFactoryAware, InitializingBean, SmartInitializingSingleton。</p>
+<p>涉及到众多需要 set 的依赖：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Map&lt;CacheOperationCacheKey, CacheOperationMetadata&gt; metadataCache =</span><br><span class="line">        <span class="keyword">new</span> ConcurrentHashMap&lt;CacheOperationCacheKey, CacheOperationMetadata&gt;(<span class="number">1024</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> CacheOperationExpressionEvaluator evaluator = <span class="keyword">new</span> CacheOperationExpressionEvaluator();</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> CacheOperationSource cacheOperationSource;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> KeyGenerator keyGenerator = <span class="keyword">new</span> SimpleKeyGenerator();</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> CacheResolver cacheResolver;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> BeanFactory beanFactory;</span><br></pre></td></tr></table></figure>
+
+<p>定义了一些对 Optional 的解包逻辑。</p>
+<p>关键是 execute 方法。真正在方法执行前后对缓存执行对应操作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Object <span class="title">execute</span><span class="params">(<span class="keyword">final</span> CacheOperationInvoker invoker, Method method, CacheOperationContexts contexts)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Special handling of synchronized invocation</span></span><br><span class="line">    <span class="keyword">if</span> (contexts.isSynchronized()) &#123;</span><br><span class="line">        CacheOperationContext context = contexts.get(CacheableOperation.class).iterator().next();</span><br><span class="line">        <span class="keyword">if</span> (isConditionPassing(context, CacheOperationExpressionEvaluator.NO_RESULT)) &#123;</span><br><span class="line">            Object key = generateKey(context, CacheOperationExpressionEvaluator.NO_RESULT);</span><br><span class="line">            Cache cache = context.getCaches().iterator().next();</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> wrapCacheValue(method, cache.get(key, <span class="keyword">new</span> Callable&lt;Object&gt;() &#123;</span><br><span class="line">                    <span class="meta">@Override</span></span><br><span class="line">                    <span class="function"><span class="keyword">public</span> Object <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                        <span class="keyword">return</span> unwrapReturnValue(invokeOperation(invoker));</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;));</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">catch</span> (Cache.ValueRetrievalException ex) &#123;</span><br><span class="line">                <span class="comment">// The invoker wraps any Throwable in a ThrowableWrapper instance so we</span></span><br><span class="line">                <span class="comment">// can just make sure that one bubbles up the stack.</span></span><br><span class="line">                <span class="keyword">throw</span> (CacheOperationInvoker.ThrowableWrapper) ex.getCause();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// No caching required, only call the underlying method</span></span><br><span class="line">            <span class="keyword">return</span> invokeOperation(invoker);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Process any early evictions</span></span><br><span class="line">    processCacheEvicts(contexts.get(CacheEvictOperation.class), <span class="keyword">true</span>,</span><br><span class="line">            CacheOperationExpressionEvaluator.NO_RESULT);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Check if we have a cached item matching the conditions</span></span><br><span class="line">    Cache.ValueWrapper cacheHit = findCachedItem(contexts.get(CacheableOperation.class));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Collect puts from any @Cacheable miss, if no cached item is found</span></span><br><span class="line">    List&lt;CachePutRequest&gt; cachePutRequests = <span class="keyword">new</span> LinkedList&lt;CachePutRequest&gt;();</span><br><span class="line">    <span class="keyword">if</span> (cacheHit == <span class="keyword">null</span>) &#123;</span><br><span class="line">        collectPutRequests(contexts.get(CacheableOperation.class),</span><br><span class="line">                CacheOperationExpressionEvaluator.NO_RESULT, cachePutRequests);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Object cacheValue;</span><br><span class="line">    Object returnValue;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (cacheHit != <span class="keyword">null</span> &amp;&amp; cachePutRequests.isEmpty() &amp;&amp; !hasCachePut(contexts)) &#123;</span><br><span class="line">        <span class="comment">// If there are no put requests, just use the cache hit</span></span><br><span class="line">        cacheValue = cacheHit.get();</span><br><span class="line">        returnValue = wrapCacheValue(method, cacheValue);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// Invoke the method if we don't have a cache hit</span></span><br><span class="line">        returnValue = invokeOperation(invoker);</span><br><span class="line">        cacheValue = unwrapReturnValue(returnValue);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Collect any explicit @CachePuts</span></span><br><span class="line">    collectPutRequests(contexts.get(CachePutOperation.class), cacheValue, cachePutRequests);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Process any collected put requests, either from @CachePut or a @Cacheable miss</span></span><br><span class="line">    <span class="keyword">for</span> (CachePutRequest cachePutRequest : cachePutRequests) &#123;</span><br><span class="line">        cachePutRequest.apply(cacheValue);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Process any late evictions</span></span><br><span class="line">    processCacheEvicts(contexts.get(CacheEvictOperation.class), <span class="keyword">false</span>, cacheValue);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> returnValue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="CacheInterceptor"><a href="#CacheInterceptor" class="headerlink" title="CacheInterceptor"></a>CacheInterceptor</h3><p>继承自 CacheAspectSupport，实现了 MethodInterceptor 和 Serializable</p>
+<p>将 CacheAspectSupport 父类的 execute 方法包装为接口的 invoke 方法的实现。</p>
+<!-- ## Cache 和 CacheManager
+
+TODO -->
+
+<h2 id="Advisor"><a href="#Advisor" class="headerlink" title="Advisor"></a>Advisor</h2><h3 id="与-Cache-无关的-AOP-advisor-基类"><a href="#与-Cache-无关的-AOP-advisor-基类" class="headerlink" title="与 Cache 无关的 AOP advisor 基类"></a>与 Cache 无关的 AOP advisor 基类</h3><p>AbstractBeanFactoryPointcutAdvisor -&gt; AbstractPointcutAdvisor -&gt; PointcutAdvisor -&gt; Advisor</p>
+<h3 id="BeanFactoryCacheOperationSourceAdvisor"><a href="#BeanFactoryCacheOperationSourceAdvisor" class="headerlink" title="BeanFactoryCacheOperationSourceAdvisor"></a>BeanFactoryCacheOperationSourceAdvisor</h3><p>继承自 AbstractBeanFactoryPointcutAdvisor。</p>
+<p>getPointcut 方法返回一个 CacheOperationSourcePointcut 的实现，getCacheOperationSource 返回用户自定义的 CacheOperationSource。</p>
+<p>注册时代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span>(name = CacheManagementConfigUtils.CACHE_ADVISOR_BEAN_NAME)</span><br><span class="line"><span class="meta">@Role</span>(BeanDefinition.ROLE_INFRASTRUCTURE)</span><br><span class="line"><span class="function"><span class="keyword">public</span> BeanFactoryCacheOperationSourceAdvisor <span class="title">cacheAdvisor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    BeanFactoryCacheOperationSourceAdvisor advisor = <span class="keyword">new</span> BeanFactoryCacheOperationSourceAdvisor();</span><br><span class="line">    advisor.setCacheOperationSource(cacheOperationSource());</span><br><span class="line">    advisor.setAdvice(cacheInterceptor());</span><br><span class="line">    advisor.setOrder(<span class="keyword">this</span>.enableCaching.&lt;Integer&gt;getNumber(<span class="string">"order"</span>));</span><br><span class="line">    <span class="keyword">return</span> advisor;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      
+        <categories>
+            
+            <category> 技术 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> Spring </tag>
+            
+            <tag> 阅读 </tag>
+            
+            <tag> Java </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[分布式事务 - 两阶段提交和三阶段提交]]></title>
       <url>https://HaleLu.github.io/2020/06/tcc-1/</url>
       <content type="html"><![CDATA[<h1 id="分布式事务"><a href="#分布式事务" class="headerlink" title="分布式事务"></a>分布式事务</h1><p>想聊聊分布式事务。</p>
 <p>看了网上的一些说法，仔细思考之后感觉都不大统一，有些就是不对。本文加入了一些自己的思考，讨论了一些实现中的细节，如果不对欢迎指正。</p>
@@ -69,7 +182,7 @@
 </ol>
 <h2 id="三阶段提交"><a href="#三阶段提交" class="headerlink" title="三阶段提交"></a>三阶段提交</h2><h3 id="相对两阶段提交的改进"><a href="#相对两阶段提交的改进" class="headerlink" title="相对两阶段提交的改进"></a>相对两阶段提交的改进</h3><p>名词上的修改没太多意义（cancel -&gt; rollback，confirm -&gt; doCommit）</p>
 <p>三阶段提交在两阶段提交上的改进就是在之前多了一步：</p>
-<p>在锁定资源之前先进行查询，确认是否可提交。我们暂时将其称之为第 0 步。</p>
+<p>在锁定资源之前先进行查询，确认是否可提交。我们暂且将其称之为第 0 步。</p>
 <p>好处是什么？</p>
 <p>还是以之前“用户下单购买某个商品”为例。对于这个场景，第 0 步会检查向优惠券服务检查优惠券是否可用、向支付业务检查账户余额是否足够、向仓储服务检查库存是否足够等。</p>
 <p>只有当第 0 步全部返回成功时，才会执行第一步的锁定资源。这时的第一步也几乎可以全部返回成功（只有并发情况下会失败）。</p>
@@ -80,6 +193,18 @@
 <p>下一章聊聊 TCC。</p>
 ]]></content>
       
+        <categories>
+            
+            <category> 技术 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 分布式事务 </tag>
+            
+        </tags>
         
     </entry>
     
@@ -164,9 +289,9 @@
         
         <tags>
             
-            <tag> 阅读 </tag>
-            
             <tag> Spring </tag>
+            
+            <tag> 阅读 </tag>
             
             <tag> Java </tag>
             
@@ -690,9 +815,9 @@
         
         <tags>
             
-            <tag> 阅读 </tag>
-            
             <tag> Spring </tag>
+            
+            <tag> 阅读 </tag>
             
             <tag> Java </tag>
             
@@ -1026,9 +1151,9 @@
         
         <tags>
             
-            <tag> 阅读 </tag>
-            
             <tag> Spring </tag>
+            
+            <tag> 阅读 </tag>
             
             <tag> Java </tag>
             
@@ -1357,9 +1482,9 @@
         
         <tags>
             
-            <tag> 阅读 </tag>
-            
             <tag> Spring </tag>
+            
+            <tag> 阅读 </tag>
             
             <tag> Java </tag>
             
@@ -1565,9 +1690,9 @@
         
         <tags>
             
-            <tag> 阅读 </tag>
-            
             <tag> Spring </tag>
+            
+            <tag> 阅读 </tag>
             
             <tag> Java </tag>
             
@@ -2782,9 +2907,9 @@
         
         <tags>
             
-            <tag> 阅读 </tag>
-            
             <tag> Spring </tag>
+            
+            <tag> 阅读 </tag>
             
             <tag> Java </tag>
             
@@ -3247,9 +3372,9 @@
         
         <tags>
             
-            <tag> 阅读 </tag>
-            
             <tag> Spring </tag>
+            
+            <tag> 阅读 </tag>
             
             <tag> Java </tag>
             
@@ -3425,9 +3550,9 @@
         
         <tags>
             
-            <tag> Redis </tag>
-            
             <tag> 阅读 </tag>
+            
+            <tag> Redis </tag>
             
             <tag> C </tag>
             
@@ -3479,11 +3604,11 @@
         
         <tags>
             
-            <tag> 技术 </tag>
-            
             <tag> .NET </tag>
             
             <tag> C# </tag>
+            
+            <tag> 技术 </tag>
             
         </tags>
         
@@ -4263,9 +4388,9 @@ With the setup described above, the generator will include all API operations in
         
         <tags>
             
-            <tag> 技术 </tag>
-            
             <tag> .NET </tag>
+            
+            <tag> 技术 </tag>
             
             <tag> WCF </tag>
             
@@ -4333,9 +4458,9 @@ With the setup described above, the generator will include all API operations in
         
         <tags>
             
-            <tag> 技术 </tag>
-            
             <tag> .NET </tag>
+            
+            <tag> 技术 </tag>
             
         </tags>
         
