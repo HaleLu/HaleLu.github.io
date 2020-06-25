@@ -4,6 +4,84 @@
   
     
     <entry>
+      <title><![CDATA[Spring Cache 2 - 配置方式]]></title>
+      <url>https://HaleLu.github.io/2020/06/spring-cache-2/</url>
+      <content type="html"><![CDATA[<p>上一篇整体但粗略聊了聊 Spring Cache 的实现，这篇开始准备聊聊细节，就从 Spring Cache 的配置注入方式聊起吧。</p>
+<blockquote>
+<p>换句话说，虽然聊的是 Spring Cache 源码，但这块其实主要聊的是 Spring Framework 的 Configuration 配置和动态代理相关的内容。</p>
+</blockquote>
+<a id="more"></a>
+
+<h1 id="Spring-Cache-的配置方式"><a href="#Spring-Cache-的配置方式" class="headerlink" title="Spring Cache 的配置方式"></a>Spring Cache 的配置方式</h1><h2 id="EnableCaching"><a href="#EnableCaching" class="headerlink" title="@EnableCaching"></a><code>@EnableCaching</code></h2><p>众所周知，Spring Cache 的启用方式是 <code>@EnableCaching</code> 注解，我们看下源码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Target</span>(ElementType.TYPE)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Import</span>(CachingConfigurationSelector.class)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> EnableCaching &#123;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">proxyTargetClass</span><span class="params">()</span> <span class="keyword">default</span> <span class="keyword">false</span></span>;</span><br><span class="line">    <span class="function">AdviceMode <span class="title">mode</span><span class="params">()</span> <span class="keyword">default</span> AdviceMode.PROXY</span>;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">order</span><span class="params">()</span> <span class="keyword">default</span> Ordered.LOWEST_PRECEDENCE</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到其 Import 了一个 <code>CachingConfigurationSelector</code>，同时定义了三个字段。其中 proxyTargetClass 和 mode 是用于动态代理的配置项，order 是用于启动顺序的配置项。</p>
+<h2 id="CachingConfigurationSelector"><a href="#CachingConfigurationSelector" class="headerlink" title="CachingConfigurationSelector"></a><code>CachingConfigurationSelector</code></h2><p>CachingConfigurationSelector 实现于 <code>AdviceModeImportSelector&lt;EnableCaching&gt;</code>，根据注解中 mode 代表的 Advice 模式选择 import 不同的 bean。</p>
+<p>已经了解 AdviceModeImportSelector 或不关心细节的读者可以跳过下面这个子模块。</p>
+<h3 id="AdviceModeImportSelector-lt-T-gt"><a href="#AdviceModeImportSelector-lt-T-gt" class="headerlink" title="AdviceModeImportSelector&lt;T&gt;"></a><code>AdviceModeImportSelector&lt;T&gt;</code></h3><p>要聊 <code>AdviceModeImportSelector</code>，必须先聊聊他实现的接口 <code>ImportSelector</code>。</p>
+<p>先看看其源码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ImportSelector</span> </span>&#123;</span><br><span class="line">    String[] selectImports(AnnotationMetadata importingClassMetadata);</span><br><span class="line">    <span class="function"><span class="keyword">default</span> Predicate&lt;String&gt; <span class="title">getExclusionFilter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>selectImports</code> 方法需要实现根据 <code>importingClassMetadata</code> 的元信息返回不同的类名数组。</p>
+<p>不妨看看 <code>AdviceModeImportSelector</code> 是怎么实现的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> String[] selectImports(AnnotationMetadata importingClassMetadata) &#123;</span><br><span class="line">    Class&lt;?&gt; annType = GenericTypeResolver.resolveTypeArgument(getClass(), AdviceModeImportSelector.class);</span><br><span class="line">    AnnotationAttributes attributes = AnnotationConfigUtils.attributesFor(importingClassMetadata, annType);</span><br><span class="line">    <span class="keyword">if</span> (attributes == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(String.format(</span><br><span class="line">                <span class="string">"@%s is not present on importing class '%s' as expected"</span>,</span><br><span class="line">                annType.getSimpleName(), importingClassMetadata.getClassName()));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    AdviceMode adviceMode = attributes.getEnum(getAdviceModeAttributeName());</span><br><span class="line">    String[] imports = selectImports(adviceMode);</span><br><span class="line">    <span class="keyword">if</span> (imports == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"Unknown AdviceMode: "</span> + adviceMode);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> imports;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们一句句解析。</p>
+<p>首先 <code>GenericTypeResolver.resolveTypeArgument(getClass(), AdviceModeImportSelector.class)</code> 的作用是取到该类在 <code>AdviceModeImportSelector</code> 上的泛型类型，对于 CachingConfigurationSelector 而言，其继承的是 <code>AdviceModeImportSelector&lt;EnableCaching&gt;</code>，所以返回的 <code>annType</code> 就是 <code>EnableCaching.class</code>。</p>
+<p>第二句 <code>AnnotationConfigUtils.attributesFor(importingClassMetadata, annType)</code>，<code>importingClassMetadata</code> 表示的是导入类的元信息（比如实际使用时我们可能将 <code>@EnableCaching</code> 注解在某个 Configuration 类或 Starter 类上，Spring Framework 中的 <code>ConfigurationClassParser</code> 会在处理这个 Configuration 类或 Starter 类的所有 <code>@Import</code> 注解时带入该配置类本身的元信息（可见于 <code>org.springframework.context.annotation.ConfigurationClassParser#processImports</code> 方法），并最终传递至 <code>selectImports</code> 方法的 <code>importingClassMetadata</code> 参数），该方法会返回配置类上 <code>@EnableCaching</code> 注解中的实际参数 Map（<code>AnnotationAttributes</code> 继承自 <code>LinkedHashMap&lt;String, Object&gt;</code>）。</p>
+<p>后面是对结果判空，跳过。</p>
+<p>第四句，<code>AdviceMode adviceMode = attributes.getEnum(getAdviceModeAttributeName())</code>，其中 <code>getAdviceModeAttributeName()</code> 返回一个常量字符串 <code>mode</code>，所以这句话会取到 <code>@EnableCaching</code> 注解中 mode 的值，保存在 <code>adviceMode</code> 中。</p>
+<p>第五句，根据 <code>adviceMode</code> 选择不同的 bean 的类名数组，这个 <code>selectImports</code> 方法是 <code>AdviceModeImportSelector</code> 的抽象方法，交给子类实现。</p>
+<p>第六和第七句，判空并返回。</p>
+<h3 id="CachingConfigurationSelector-的-selectImports-实现"><a href="#CachingConfigurationSelector-的-selectImports-实现" class="headerlink" title="CachingConfigurationSelector 的 selectImports 实现"></a>CachingConfigurationSelector 的 selectImports 实现</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> String[] selectImports(AdviceMode adviceMode) &#123;</span><br><span class="line">    <span class="keyword">switch</span> (adviceMode) &#123;</span><br><span class="line">        <span class="keyword">case</span> PROXY:</span><br><span class="line">            <span class="keyword">return</span> getProxyImports();</span><br><span class="line">        <span class="keyword">case</span> ASPECTJ:</span><br><span class="line">            <span class="keyword">return</span> getAspectJImports();</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方法本身很简单，交给 <code>getProxyImports</code> 和 <code>getAspectJImports</code> 选择不同的动态代理模式的类名。</p>
+<p>先看两个配置项：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String PROXY_JCACHE_CONFIGURATION_CLASS =</span><br><span class="line">        <span class="string">"org.springframework.cache.jcache.config.ProxyJCacheConfiguration"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">boolean</span> jsr107Present = ClassUtils.isPresent(</span><br><span class="line">        <span class="string">"javax.cache.Cache"</span>, CachingConfigurationSelector.class.getClassLoader());</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">boolean</span> jcacheImplPresent = ClassUtils.isPresent(</span><br><span class="line">        PROXY_JCACHE_CONFIGURATION_CLASS, CachingConfigurationSelector.class.getClassLoader());</span><br></pre></td></tr></table></figure>
+
+<p>关于什么是 JSR 107 标准和 JCache 详细的此处不再赘述，更多资料可自行搜索。简单来说就是 JSR 107 规定了一套 JCache API 规范，如下图所示：</p>
+<p><img src="./jsr107.png" alt></p>
+<p>jsr107Present 和 jcacheImplPresent 都为 true 时表示需要启用 jcache 支持。</p>
+<p>对于 Proxy 模式，注入的是 AutoProxyRegistrar 和 ProxyCachingConfiguration（如果启用 JCache 还注入 ProxyJCacheConfiguration）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String PROXY_JCACHE_CONFIGURATION_CLASS =</span><br><span class="line">        <span class="string">"org.springframework.cache.jcache.config.ProxyJCacheConfiguration"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> String[] getProxyImports() &#123;</span><br><span class="line">    List&lt;String&gt; result = <span class="keyword">new</span> ArrayList&lt;String&gt;(<span class="number">3</span>);</span><br><span class="line">    result.add(AutoProxyRegistrar.class.getName());</span><br><span class="line">    result.add(ProxyCachingConfiguration.class.getName());</span><br><span class="line">    <span class="keyword">if</span> (jsr107Present &amp;&amp; jcacheImplPresent) &#123;</span><br><span class="line">        result.add(PROXY_JCACHE_CONFIGURATION_CLASS);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> StringUtils.toStringArray(result);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对于 AspectJ 模式，注入的是 AspectJCachingConfiguration （如果启用 JCache 还注入 AspectJJCacheConfiguration）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String CACHE_ASPECT_CONFIGURATION_CLASS_NAME =</span><br><span class="line">        <span class="string">"org.springframework.cache.aspectj.AspectJCachingConfiguration"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String JCACHE_ASPECT_CONFIGURATION_CLASS_NAME =</span><br><span class="line">        <span class="string">"org.springframework.cache.aspectj.AspectJJCacheConfiguration"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> String[] getAspectJImports() &#123;</span><br><span class="line">    List&lt;String&gt; result = <span class="keyword">new</span> ArrayList&lt;String&gt;(<span class="number">2</span>);</span><br><span class="line">    result.add(CACHE_ASPECT_CONFIGURATION_CLASS_NAME);</span><br><span class="line">    <span class="keyword">if</span> (jsr107Present &amp;&amp; jcacheImplPresent) &#123;</span><br><span class="line">        result.add(JCACHE_ASPECT_CONFIGURATION_CLASS_NAME);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> StringUtils.toStringArray(result);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通常而言，我们使用的是默认的 Proxy 方式，且不会使用到 JCache。也就是说只注入了 AutoProxyRegistrar 和 ProxyCachingConfiguration。</p>
+<p>再说一说这个 <code>AutoProxyRegistrar</code> 类，其实也是一个与 cache 功能无关的类，其功能源码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerBeanDefinitions</span><span class="params">(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">boolean</span> candidateFound = <span class="keyword">false</span>;</span><br><span class="line">    Set&lt;String&gt; annTypes = importingClassMetadata.getAnnotationTypes();</span><br><span class="line">    <span class="keyword">for</span> (String annType : annTypes) &#123;</span><br><span class="line">        AnnotationAttributes candidate = AnnotationConfigUtils.attributesFor(importingClassMetadata, annType);</span><br><span class="line">        <span class="keyword">if</span> (candidate == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        Object mode = candidate.get(<span class="string">"mode"</span>);</span><br><span class="line">        Object proxyTargetClass = candidate.get(<span class="string">"proxyTargetClass"</span>);</span><br><span class="line">        <span class="keyword">if</span> (mode != <span class="keyword">null</span> &amp;&amp; proxyTargetClass != <span class="keyword">null</span> &amp;&amp; AdviceMode.class == mode.getClass() &amp;&amp;</span><br><span class="line">                Boolean.class == proxyTargetClass.getClass()) &#123;</span><br><span class="line">            candidateFound = <span class="keyword">true</span>;</span><br><span class="line">            <span class="keyword">if</span> (mode == AdviceMode.PROXY) &#123;</span><br><span class="line">                AopConfigUtils.registerAutoProxyCreatorIfNecessary(registry);</span><br><span class="line">                <span class="keyword">if</span> ((Boolean) proxyTargetClass) &#123;</span><br><span class="line">                    AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry);</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!candidateFound &amp;&amp; logger.isWarnEnabled()) &#123;</span><br><span class="line">        String name = getClass().getSimpleName();</span><br><span class="line">        logger.warn(String.format(<span class="string">"%s was imported but no annotations were found "</span> +</span><br><span class="line">                <span class="string">"having both 'mode' and 'proxyTargetClass' attributes of type "</span> +</span><br><span class="line">                <span class="string">"AdviceMode and boolean respectively. This means that auto proxy "</span> +</span><br><span class="line">                <span class="string">"creator registration and configuration may not have occurred as "</span> +</span><br><span class="line">                <span class="string">"intended, and components may not be proxied as expected. Check to "</span> +</span><br><span class="line">                <span class="string">"ensure that %s has been @Import'ed on the same class where these "</span> +</span><br><span class="line">                <span class="string">"annotations are declared; otherwise remove the import of %s "</span> +</span><br><span class="line">                <span class="string">"altogether."</span>, name, name, name));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>文档的注释直接翻译过来是这样：</p>
+<blockquote>
+<p>针对给定的注册表注册，升级和配置标准自动代理创建器（APC）。通过查找在 <code>@Configuration</code> 具有 mode 和 proxyTargetClass 属性的导入类上声明的最接近的注释来工作。如果 mode 设置为 PROXY，则注册 APC；如果 proxyTargetClass 设置为 true，则 APC 被强制使用子类（CGLIB）代理。</p>
+<p>几个 <code>@Enable*</code> 注释同时公开 mode 和 proxyTargetClass 属性。重要的是要注意，大多数这些功能最终都共享一个 APC。因此，此实现并不“在乎”它找到的批注的确切含义——只要它公开了权限 mode 和 proxyTargetClass 属性，就可以对 APC 进行相同的注册和配置。</p>
+</blockquote>
+<p>看一下代码，头两行与 AdviceModeImportSelector 的 selectImports 实现类似，由 candidate 拿到注解里的参数。</p>
+<p>接下来判断需要存在 mode 和 proxyTargetClass 参数且类型分别是 AdviceMode 和 Boolean，则置 candidateFound 标识位为 true，说明找到了对应的自动代理配置的注解。</p>
+<p>如果 mode 是 PROXY 模式，则调用 <code>AopConfigUtils.registerAutoProxyCreatorIfNecessary(registry)</code> 方法，如果 proxyTargetClass （为 true 时强制全部使用 CGLIB，为 false 时对实现了接口的使用 JDK 动态代理，没有接口的使用 CGLIB），再调用 <code>AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry)</code> 方法。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> 技术 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 阅读 </tag>
+            
+            <tag> Spring </tag>
+            
+            <tag> Java </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[Spring Cache 源码分析]]></title>
       <url>https://HaleLu.github.io/2020/06/spring-cache/</url>
       <content type="html"><![CDATA[<p>最近想写批量操作的缓存 AOP，于是研究了一下 Spring 原生的 Cache 源码，以便编些自己的 BatchCache AOP。</p>
@@ -106,9 +184,9 @@ TODO -->
         
         <tags>
             
-            <tag> Spring </tag>
-            
             <tag> 阅读 </tag>
+            
+            <tag> Spring </tag>
             
             <tag> Java </tag>
             
@@ -182,7 +260,7 @@ TODO -->
 </ol>
 <h2 id="三阶段提交"><a href="#三阶段提交" class="headerlink" title="三阶段提交"></a>三阶段提交</h2><h3 id="相对两阶段提交的改进"><a href="#相对两阶段提交的改进" class="headerlink" title="相对两阶段提交的改进"></a>相对两阶段提交的改进</h3><p>名词上的修改没太多意义（cancel -&gt; rollback，confirm -&gt; doCommit）</p>
 <p>三阶段提交在两阶段提交上的改进就是在之前多了一步：</p>
-<p>在锁定资源之前先进行查询，确认是否可提交。我们暂且将其称之为第 0 步。</p>
+<p>在锁定资源之前先进行查询，确认是否可提交。我们姑且将其称之为第 0 步。</p>
 <p>好处是什么？</p>
 <p>还是以之前“用户下单购买某个商品”为例。对于这个场景，第 0 步会检查向优惠券服务检查优惠券是否可用、向支付业务检查账户余额是否足够、向仓储服务检查库存是否足够等。</p>
 <p>只有当第 0 步全部返回成功时，才会执行第一步的锁定资源。这时的第一步也几乎可以全部返回成功（只有并发情况下会失败）。</p>
@@ -289,9 +367,9 @@ TODO -->
         
         <tags>
             
-            <tag> Spring </tag>
-            
             <tag> 阅读 </tag>
+            
+            <tag> Spring </tag>
             
             <tag> Java </tag>
             
@@ -815,9 +893,9 @@ TODO -->
         
         <tags>
             
-            <tag> Spring </tag>
-            
             <tag> 阅读 </tag>
+            
+            <tag> Spring </tag>
             
             <tag> Java </tag>
             
@@ -1151,9 +1229,9 @@ TODO -->
         
         <tags>
             
-            <tag> Spring </tag>
-            
             <tag> 阅读 </tag>
+            
+            <tag> Spring </tag>
             
             <tag> Java </tag>
             
@@ -1482,9 +1560,9 @@ TODO -->
         
         <tags>
             
-            <tag> Spring </tag>
-            
             <tag> 阅读 </tag>
+            
+            <tag> Spring </tag>
             
             <tag> Java </tag>
             
@@ -1690,9 +1768,9 @@ TODO -->
         
         <tags>
             
-            <tag> Spring </tag>
-            
             <tag> 阅读 </tag>
+            
+            <tag> Spring </tag>
             
             <tag> Java </tag>
             
@@ -2907,9 +2985,9 @@ TODO -->
         
         <tags>
             
-            <tag> Spring </tag>
-            
             <tag> 阅读 </tag>
+            
+            <tag> Spring </tag>
             
             <tag> Java </tag>
             
@@ -3372,9 +3450,9 @@ TODO -->
         
         <tags>
             
-            <tag> Spring </tag>
-            
             <tag> 阅读 </tag>
+            
+            <tag> Spring </tag>
             
             <tag> Java </tag>
             
@@ -3550,9 +3628,9 @@ TODO -->
         
         <tags>
             
-            <tag> 阅读 </tag>
-            
             <tag> Redis </tag>
+            
+            <tag> 阅读 </tag>
             
             <tag> C </tag>
             
