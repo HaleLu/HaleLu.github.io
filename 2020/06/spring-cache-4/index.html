@@ -1,0 +1,994 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="阅读,Spring,Java,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1">
+
+
+
+
+
+
+<meta name="description" content="上一章对于 AnnotationCacheOperationSource 中用到的 SpringCacheAnnotationParser 没有细讲完，这篇单独细讲一下。">
+<meta name="keywords" content="阅读,Spring,Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Cache (4) - Operation 解析器">
+<meta property="og:url" content="https://HaleLu.github.io/2020/06/spring-cache-4/index.html">
+<meta property="og:site_name" content="Move your idea forward.">
+<meta property="og:description" content="上一章对于 AnnotationCacheOperationSource 中用到的 SpringCacheAnnotationParser 没有细讲完，这篇单独细讲一下。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-06-26T15:01:44.119Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring Cache (4) - Operation 解析器">
+<meta name="twitter:description" content="上一章对于 AnnotationCacheOperationSource 中用到的 SpringCacheAnnotationParser 没有细讲完，这篇单独细讲一下。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 6279916590628603000,
+      author: '（博主大人~）'
+    }
+  };
+</script>
+
+  <title> Spring Cache (4) - Operation 解析器 | Move your idea forward. </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-77199457-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Move your idea forward.</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Hale Lu's Blog</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="#" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Spring Cache (4) - Operation 解析器
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2020-06-26T22:48:32+08:00" content="2020-06-26">
+              2020-06-26
+            </time>
+          </span>
+
+          
+            <span class="post-category">
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2020/06/spring-cache-4/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/06/spring-cache-4/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+             <span id="/2020/06/spring-cache-4/" class="leancloud_visitors" data-flag-title="Spring Cache (4) - Operation 解析器">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一章对于 AnnotationCacheOperationSource 中用到的 SpringCacheAnnotationParser 没有细讲完，这篇单独细讲一下。</p>
+<a id="more"></a>
+
+<h1 id="Spring-Cache-的-Operation-解析器"><a href="#Spring-Cache-的-Operation-解析器" class="headerlink" title="Spring Cache 的 Operation 解析器"></a>Spring Cache 的 Operation 解析器</h1><p>Operation 解析器最底层的接口是 CacheAnnotationParser，我们先来看下这个接口</p>
+<h2 id="CacheAnnotationParser"><a href="#CacheAnnotationParser" class="headerlink" title="CacheAnnotationParser"></a>CacheAnnotationParser</h2><p>接口的定义十分简单：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">CacheAnnotationParser</span> </span>&#123;</span><br><span class="line">    <span class="function">Collection&lt;CacheOperation&gt; <span class="title">parseCacheAnnotations</span><span class="params">(Class&lt;?&gt; type)</span></span>;</span><br><span class="line">    <span class="function">Collection&lt;CacheOperation&gt; <span class="title">parseCacheAnnotations</span><span class="params">(Method method)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>要求了实现类计算出 目标类 或 方法 对应的 CacheOperation 集合。</p>
+<h2 id="SpringCacheAnnotationParser"><a href="#SpringCacheAnnotationParser" class="headerlink" title="SpringCacheAnnotationParser"></a>SpringCacheAnnotationParser</h2><p>SpringCacheAnnotationParser 实现了 CacheAnnotationParser 这个接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Collection&lt;CacheOperation&gt; <span class="title">parseCacheAnnotations</span><span class="params">(Class&lt;?&gt; type)</span> </span>&#123;</span><br><span class="line">    DefaultCacheConfig defaultConfig = getDefaultCacheConfig(type);</span><br><span class="line">    <span class="keyword">return</span> parseCacheAnnotations(defaultConfig, type);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Collection&lt;CacheOperation&gt; <span class="title">parseCacheAnnotations</span><span class="params">(Method method)</span> </span>&#123;</span><br><span class="line">    DefaultCacheConfig defaultConfig = getDefaultCacheConfig(method.getDeclaringClass());</span><br><span class="line">    <span class="keyword">return</span> parseCacheAnnotations(defaultConfig, method);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从目标类或方法的声明类上取得默认的 CacheConfig，再执行 parseCacheAnnotations 方法进行解析。</p>
+<p>我们先看这个 getDefaultCacheConfig 方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">DefaultCacheConfig <span class="title">getDefaultCacheConfig</span><span class="params">(Class&lt;?&gt; target)</span> </span>&#123;</span><br><span class="line">    CacheConfig annotation = AnnotatedElementUtils.getMergedAnnotation(target, CacheConfig.class);</span><br><span class="line">    <span class="keyword">if</span> (annotation != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> DefaultCacheConfig(annotation.cacheNames(), annotation.keyGenerator(),</span><br><span class="line">                annotation.cacheManager(), annotation.cacheResolver());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> DefaultCacheConfig();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>非常简单，就是从类的 <code>@CacheConfig</code> 注解中取出 <code>cacheNames</code>、<code>keyGenerator</code>、<code>cacheManager</code>、<code>cacheResolver</code> 这四个属性值。</p>
+<p>parseCacheAnnotations 方法就较为复杂了，需要解析 <code>Cacheable</code>、<code>CacheEvict</code>、<code>CachePut</code>、<code>Caching</code> 四种注解：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Collection&lt;CacheOperation&gt; <span class="title">parseCacheAnnotations</span><span class="params">(DefaultCacheConfig cachingConfig, AnnotatedElement ae)</span> </span>&#123;</span><br><span class="line">    Collection&lt;CacheOperation&gt; ops = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    Collection&lt;Cacheable&gt; cacheables = AnnotatedElementUtils.getAllMergedAnnotations(ae, Cacheable.class);</span><br><span class="line">    <span class="keyword">if</span> (!cacheables.isEmpty()) &#123;</span><br><span class="line">        ops = lazyInit(ops);</span><br><span class="line">        <span class="keyword">for</span> (Cacheable cacheable : cacheables) &#123;</span><br><span class="line">            ops.add(parseCacheableAnnotation(ae, cachingConfig, cacheable));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Collection&lt;CacheEvict&gt; evicts = AnnotatedElementUtils.getAllMergedAnnotations(ae, CacheEvict.class);</span><br><span class="line">    <span class="keyword">if</span> (!evicts.isEmpty()) &#123;</span><br><span class="line">        ops = lazyInit(ops);</span><br><span class="line">        <span class="keyword">for</span> (CacheEvict evict : evicts) &#123;</span><br><span class="line">            ops.add(parseEvictAnnotation(ae, cachingConfig, evict));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Collection&lt;CachePut&gt; puts = AnnotatedElementUtils.getAllMergedAnnotations(ae, CachePut.class);</span><br><span class="line">    <span class="keyword">if</span> (!puts.isEmpty()) &#123;</span><br><span class="line">        ops = lazyInit(ops);</span><br><span class="line">        <span class="keyword">for</span> (CachePut put : puts) &#123;</span><br><span class="line">            ops.add(parsePutAnnotation(ae, cachingConfig, put));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Collection&lt;Caching&gt; cachings = AnnotatedElementUtils.getAllMergedAnnotations(ae, Caching.class);</span><br><span class="line">    <span class="keyword">if</span> (!cachings.isEmpty()) &#123;</span><br><span class="line">        ops = lazyInit(ops);</span><br><span class="line">        <span class="keyword">for</span> (Caching caching : cachings) &#123;</span><br><span class="line">            Collection&lt;CacheOperation&gt; cachingOps = parseCachingAnnotation(ae, cachingConfig, caching);</span><br><span class="line">            <span class="keyword">if</span> (cachingOps != <span class="keyword">null</span>) &#123;</span><br><span class="line">                ops.addAll(cachingOps);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> ops;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个 lazyInit 就是数组的懒初始化，不解释了：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> &lt;T extends Annotation&gt; <span class="function">Collection&lt;CacheOperation&gt; <span class="title">lazyInit</span><span class="params">(Collection&lt;CacheOperation&gt; ops)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (ops != <span class="keyword">null</span> ? ops : <span class="keyword">new</span> ArrayList&lt;CacheOperation&gt;(<span class="number">1</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="对-Cacheable、CacheEvict、CachePut-进行注解解析"><a href="#对-Cacheable、CacheEvict、CachePut-进行注解解析" class="headerlink" title="对 Cacheable、CacheEvict、CachePut 进行注解解析"></a>对 Cacheable、CacheEvict、CachePut 进行注解解析</h3><p>这三者的注解解析大同小异，parseXXXAnnotation（XXX = Cacheable/Evict/Put）的方法实现基本一致：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">CacheXXXOperation <span class="title">parseXXXAnnotation</span><span class="params">(AnnotatedElement ae, DefaultCacheConfig defaultConfig, CacheXXX cacheXXX)</span> </span>&#123;</span><br><span class="line">    CacheXXXOperation.Builder builder = <span class="keyword">new</span> CacheXXXOperation.Builder();</span><br><span class="line"></span><br><span class="line">    builder.setName(ae.toString());</span><br><span class="line">    builder.setCacheNames(cacheXXX.cacheNames());</span><br><span class="line">    builder.setCondition(cacheXXX.condition());</span><br><span class="line">    builder.setKey(cacheXXX.key());</span><br><span class="line">    builder.setKeyGenerator(cacheXXX.keyGenerator());</span><br><span class="line">    builder.setCacheManager(cacheXXX.cacheManager());</span><br><span class="line">    builder.setCacheResolver(cacheXXX.cacheResolver());</span><br><span class="line">    <span class="comment">// 此处略有不同根据三种 CacheOperation 参数情况略有不同，下文详说</span></span><br><span class="line"></span><br><span class="line">    defaultConfig.applyDefault(builder);</span><br><span class="line">    CacheXXXOperation op = builder.build();</span><br><span class="line">    validateCacheOperation(ae, op);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> op;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除了上文的 8 个字段外，Cacheable 独有 unless 和 sync 字段，Evict 独有 cacheWide（取自注解的 allEntries 字段） 和 beforeInvocation 字段，Put 独有 unless 字段。</p>
+<h3 id="对-Caching-进行注解解析"><a href="#对-Caching-进行注解解析" class="headerlink" title="对 Caching 进行注解解析"></a>对 Caching 进行注解解析</h3><p>因为 Caching 本身是一个聚合注解，其定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Target</span>(&#123;ElementType.METHOD, ElementType.TYPE&#125;)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Inherited</span></span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Caching &#123;</span><br><span class="line">    Cacheable[] cacheable() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">    CachePut[] put() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">    CacheEvict[] evict() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以其需要执行类似 parseCacheAnnotations 的操作，将 Cacheable、CachePut、CacheEvict 三种注解分别转换再聚合起来：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Collection&lt;CacheOperation&gt; <span class="title">parseCachingAnnotation</span><span class="params">(AnnotatedElement ae, DefaultCacheConfig defaultConfig, Caching caching)</span> </span>&#123;</span><br><span class="line">    Collection&lt;CacheOperation&gt; ops = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    Cacheable[] cacheables = caching.cacheable();</span><br><span class="line">    <span class="keyword">if</span> (!ObjectUtils.isEmpty(cacheables)) &#123;</span><br><span class="line">        ops = lazyInit(ops);</span><br><span class="line">        <span class="keyword">for</span> (Cacheable cacheable : cacheables) &#123;</span><br><span class="line">            ops.add(parseCacheableAnnotation(ae, defaultConfig, cacheable));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    CacheEvict[] cacheEvicts = caching.evict();</span><br><span class="line">    <span class="keyword">if</span> (!ObjectUtils.isEmpty(cacheEvicts)) &#123;</span><br><span class="line">        ops = lazyInit(ops);</span><br><span class="line">        <span class="keyword">for</span> (CacheEvict cacheEvict : cacheEvicts) &#123;</span><br><span class="line">            ops.add(parseEvictAnnotation(ae, defaultConfig, cacheEvict));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    CachePut[] cachePuts = caching.put();</span><br><span class="line">    <span class="keyword">if</span> (!ObjectUtils.isEmpty(cachePuts)) &#123;</span><br><span class="line">        ops = lazyInit(ops);</span><br><span class="line">        <span class="keyword">for</span> (CachePut cachePut : cachePuts) &#123;</span><br><span class="line">            ops.add(parsePutAnnotation(ae, defaultConfig, cachePut));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> ops;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="SpringCacheAnnotationParser-小结"><a href="#SpringCacheAnnotationParser-小结" class="headerlink" title="SpringCacheAnnotationParser 小结"></a>SpringCacheAnnotationParser 小结</h3><p>SpringCacheAnnotationParser 本质上就是将 Cacheable、CacheEvict、CachePut 和 Caching 的注解参数转换成了 CacheOperation 集合的结构。</p>
+
+      
+    </div>
+    
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/阅读/" rel="tag">#阅读</a>
+          
+            <a href="/tags/Spring/" rel="tag">#Spring</a>
+          
+            <a href="/tags/Java/" rel="tag">#Java</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/spring-cache-3/" rel="next" title="Spring Cache (3) - Pointcut、Advice 和 Advisor">
+                <i class="fa fa-chevron-left"></i> Spring Cache (3) - Pointcut、Advice 和 Advisor
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2020/06/spring-cache-4/" data-title="Spring Cache (4) - Operation 解析器" data-url="https://HaleLu.github.io/2020/06/spring-cache-4/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Hale Lu">
+          <p class="site-author-name" itemprop="name">Hale Lu</p>
+          <p class="site-description motion-element" itemprop="description">一只欠觉的开发狗</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">43</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">31</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/halelu" target="_blank" title="Github">
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://www.zhihu.com/people/hao-lu-42-29" target="_blank" title="知乎">
+                  
+                  知乎
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://wpa.qq.com/msgrd?v=3&uin=773622805&site=qq&menu=yes" target="_blank" title="QQ">
+                  
+                  QQ
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa fa-globe fa-fw"></i>
+              各路大神
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://pmextra.github.io/" title="PM Extra's Blog" target="_blank">PM Extra's Blog</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://hzlclock.wordpress.com/" title="Hebert's Blog" target="_blank">Hebert's Blog</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="https://www.rexskz.info/" title="Rex's Blog" target="_blank">Rex's Blog</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Spring-Cache-的-Operation-解析器"><span class="nav-number">1.</span> <span class="nav-text">Spring Cache 的 Operation 解析器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CacheAnnotationParser"><span class="nav-number">1.1.</span> <span class="nav-text">CacheAnnotationParser</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SpringCacheAnnotationParser"><span class="nav-number">1.2.</span> <span class="nav-text">SpringCacheAnnotationParser</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#对-Cacheable、CacheEvict、CachePut-进行注解解析"><span class="nav-number">1.2.1.</span> <span class="nav-text">对 Cacheable、CacheEvict、CachePut 进行注解解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对-Caching-进行注解解析"><span class="nav-number">1.2.2.</span> <span class="nav-text">对 Caching 进行注解解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SpringCacheAnnotationParser-小结"><span class="nav-number">1.2.3.</span> <span class="nav-text">SpringCacheAnnotationParser 小结</span></a></li></ol></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hale Lu</span>
+</div>
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="http://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"halelu"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+      
+      <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+      <script src="/js/src/hook-duoshuo.js"></script>
+    
+  
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';                
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+                            
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').mousedown(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("ABk8fYaVcvf6P6IuuGNY2rRa-gzGzoHsz", "3Vpj3qkDsPj8Rlh92mHOxAMV");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>
