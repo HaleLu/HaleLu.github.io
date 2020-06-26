@@ -95,15 +95,15 @@
 <meta name="description" content="上一篇整体但粗略聊了聊 Spring Cache 的实现，这篇开始准备聊聊细节，就从 Spring Cache 的配置注入方式聊起吧。  换句话说，虽然聊的是 Spring Cache 源码，但这块其实主要聊的是 Spring Framework 的 Configuration 配置和动态代理相关的内容。">
 <meta name="keywords" content="阅读,Spring,Java">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Spring Cache 2 - 配置方式">
+<meta property="og:title" content="Spring Cache (2) - 配置方式">
 <meta property="og:url" content="https://HaleLu.github.io/2020/06/spring-cache-2/index.html">
 <meta property="og:site_name" content="Move your idea forward.">
 <meta property="og:description" content="上一篇整体但粗略聊了聊 Spring Cache 的实现，这篇开始准备聊聊细节，就从 Spring Cache 的配置注入方式聊起吧。  换句话说，虽然聊的是 Spring Cache 源码，但这块其实主要聊的是 Spring Framework 的 Configuration 配置和动态代理相关的内容。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://halelu.github.io/2020/06/spring-cache-2/jsr107.png">
-<meta property="og:updated_time" content="2020-06-25T15:44:05.719Z">
+<meta property="og:updated_time" content="2020-06-26T01:36:45.717Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Spring Cache 2 - 配置方式">
+<meta name="twitter:title" content="Spring Cache (2) - 配置方式">
 <meta name="twitter:description" content="上一篇整体但粗略聊了聊 Spring Cache 的实现，这篇开始准备聊聊细节，就从 Spring Cache 的配置注入方式聊起吧。  换句话说，虽然聊的是 Spring Cache 源码，但这块其实主要聊的是 Spring Framework 的 Configuration 配置和动态代理相关的内容。">
 <meta name="twitter:image" content="https://halelu.github.io/2020/06/spring-cache-2/jsr107.png">
 
@@ -123,7 +123,7 @@
   };
 </script>
 
-  <title> Spring Cache 2 - 配置方式 | Move your idea forward. </title>
+  <title> Spring Cache (2) - 配置方式 | Move your idea forward. </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -285,7 +285,7 @@
             
             
               
-                Spring Cache 2 - 配置方式
+                Spring Cache (2) - 配置方式
               
             
           </h1>
@@ -338,7 +338,7 @@
 
           
           
-             <span id="/2020/06/spring-cache-2/" class="leancloud_visitors" data-flag-title="Spring Cache 2 - 配置方式">
+             <span id="/2020/06/spring-cache-2/" class="leancloud_visitors" data-flag-title="Spring Cache (2) - 配置方式">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -414,6 +414,18 @@
 <p>看一下代码，头两行与 AdviceModeImportSelector 的 selectImports 实现类似，由 candidate 拿到注解里的参数。</p>
 <p>接下来判断需要存在 mode 和 proxyTargetClass 参数且类型分别是 AdviceMode 和 Boolean，则置 candidateFound 标识位为 true，说明找到了对应的自动代理配置的注解。</p>
 <p>如果 mode 是 PROXY 模式，则调用 <code>AopConfigUtils.registerAutoProxyCreatorIfNecessary(registry)</code> 方法，如果 proxyTargetClass （为 true 时强制全部使用 CGLIB，为 false 时对实现了接口的使用 JDK 动态代理，没有接口的使用 CGLIB），再调用 <code>AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry)</code> 方法。</p>
+<p>这个 <code>AopConfigUtils.registerAutoProxyCreatorIfNecessary(registry)</code> 方法内部追踪下去就是调用了一句 <code>registerOrEscalateApcAsRequired(InfrastructureAdvisorAutoProxyCreator.class, registry, null)</code>。内部功能代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String AUTO_PROXY_CREATOR_BEAN_NAME =</span><br><span class="line">        <span class="string">"org.springframework.aop.config.internalAutoProxyCreator"</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> BeanDefinition <span class="title">registerOrEscalateApcAsRequired</span><span class="params">(Class&lt;?&gt; cls, BeanDefinitionRegistry registry, Object source)</span> </span>&#123;</span><br><span class="line">    Assert.notNull(registry, <span class="string">"BeanDefinitionRegistry must not be null"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (registry.containsBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME)) &#123;</span><br><span class="line">        BeanDefinition apcDefinition = registry.getBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME);</span><br><span class="line">        <span class="keyword">if</span> (!cls.getName().equals(apcDefinition.getBeanClassName())) &#123;</span><br><span class="line">            <span class="keyword">int</span> currentPriority = findPriorityForClass(apcDefinition.getBeanClassName());</span><br><span class="line">            <span class="keyword">int</span> requiredPriority = findPriorityForClass(cls);</span><br><span class="line">            <span class="keyword">if</span> (currentPriority &lt; requiredPriority) &#123;</span><br><span class="line">                apcDefinition.setBeanClassName(cls.getName());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    RootBeanDefinition beanDefinition = <span class="keyword">new</span> RootBeanDefinition(cls);</span><br><span class="line">    beanDefinition.setSource(source);</span><br><span class="line">    beanDefinition.getPropertyValues().add(<span class="string">"order"</span>, Ordered.HIGHEST_PRECEDENCE);</span><br><span class="line">    beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);</span><br><span class="line">    registry.registerBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME, beanDefinition);</span><br><span class="line">    <span class="keyword">return</span> beanDefinition;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中这个 findPriorityForClass 就是取了 class 在数组里的下标：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> List&lt;Class&lt;?&gt;&gt; APC_PRIORITY_LIST = <span class="keyword">new</span> ArrayList&lt;Class&lt;?&gt;&gt;(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">    <span class="comment">// Set up the escalation list...</span></span><br><span class="line">    APC_PRIORITY_LIST.add(InfrastructureAdvisorAutoProxyCreator.class);</span><br><span class="line">    APC_PRIORITY_LIST.add(AspectJAwareAdvisorAutoProxyCreator.class);</span><br><span class="line">    APC_PRIORITY_LIST.add(AnnotationAwareAspectJAutoProxyCreator.class);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>也就是说，<code>registerOrEscalateApcAsRequired</code> 方法会将 <code>cls</code> 注册为 <code>org.springframework.aop.config.internalAutoProxyCreator</code>，如果再次注册了 <code>AspectJAwareAdvisorAutoProxyCreator</code> 乃至 <code>AnnotationAwareAspectJAutoProxyCreator</code>，那么后者会顶替前者成为 internalAutoProxyCreator。同级别乃至更低级别则不会再顶替。</p>
+<p>而被注册的这个 <code>InfrastructureAdvisorAutoProxyCreator</code> 不再深挖，简单来说他会只注册所有定义上有 <code>role = BeanDefinition.ROLE_INFRASTRUCTURE</code> 的 advisor bean。</p>
+<p>如果 <code>proxyTargetClass</code> 时执行的 <code>AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry)</code> 定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">forceAutoProxyCreatorToUseClassProxying</span><span class="params">(BeanDefinitionRegistry registry)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (registry.containsBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME)) &#123;</span><br><span class="line">        BeanDefinition definition = registry.getBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME);</span><br><span class="line">        definition.getPropertyValues().add(<span class="string">"proxyTargetClass"</span>, Boolean.TRUE);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>简单来说就是在 bean 定义上添加了一条 <code>proxyTargetClass=true</code> 的属性。</p>
 
       
     </div>
@@ -479,7 +491,7 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2020/06/spring-cache-2/" data-title="Spring Cache 2 - 配置方式" data-url="https://HaleLu.github.io/2020/06/spring-cache-2/">
+      <div class="ds-thread" data-thread-key="2020/06/spring-cache-2/" data-title="Spring Cache (2) - 配置方式" data-url="https://HaleLu.github.io/2020/06/spring-cache-2/">
       </div>
     
   </div>
