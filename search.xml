@@ -226,7 +226,7 @@
     </entry>
     
     <entry>
-      <title><![CDATA[Spring Cache 源码分析]]></title>
+      <title><![CDATA[Spring Cache (1) - 源码分析]]></title>
       <url>https://HaleLu.github.io/2020/06/spring-cache/</url>
       <content type="html"><![CDATA[<p>最近想写批量操作的缓存 AOP，于是研究了一下 Spring 原生的 Cache 源码，以便编些自己的 BatchCache AOP。</p>
 <a id="more"></a>
