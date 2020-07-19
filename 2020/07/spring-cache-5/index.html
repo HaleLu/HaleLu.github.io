@@ -101,7 +101,7 @@
 <meta property="og:description" content="上上篇还有一章 CacheInterceptor 的基类 CacheAspectSupport 没有细讲，这篇详细讲解一下。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://halelu.github.io/2020/07/spring-cache-5/CacheInterceptor.png">
-<meta property="og:updated_time" content="2020-07-06T16:04:54.036Z">
+<meta property="og:updated_time" content="2020-07-18T17:17:18.817Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spring Cache (5) - 核心部分 CacheAspectSupport">
 <meta name="twitter:description" content="上上篇还有一章 CacheInterceptor 的基类 CacheAspectSupport 没有细讲，这篇详细讲解一下。">
@@ -398,7 +398,7 @@
 <p>再将显式注解的 CachePutOperation 聚合到之前的 Put 操作集合中，依次调用 <code>cachePutRequest.apply(cacheValue)</code>。</p>
 <p>最后执行函数后清空缓存的 CacheEvicts 操作。然后返回之前的返回值。</p>
 <h3 id="没有仔细讲的细节"><a href="#没有仔细讲的细节" class="headerlink" title="没有仔细讲的细节"></a>没有仔细讲的细节</h3><p>在这个过程中，对返回值和异常穿插 wrap 和 unwrap 的处理，支持了有 Optional 的情况。</p>
-<p>关于例如 generateKey 这些设计到的表达式 Evaluation 的部分下章细讲。</p>
+<p>关于例如 generateKey 这些到的涉及表达式 Evaluation 的部分下章细讲。</p>
 
       
     </div>
@@ -439,6 +439,10 @@
           </div>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/07/spring-cache-6/" rel="prev" title="Spring Cache (6) - CacheOperationExpressionEvaluator 中的表达式求值">
+                Spring Cache (6) - CacheOperationExpressionEvaluator 中的表达式求值 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -507,7 +511,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">44</span>
+              <span class="site-state-item-count">45</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

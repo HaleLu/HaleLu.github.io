@@ -4,6 +4,64 @@
   
     
     <entry>
+      <title><![CDATA[Spring Cache (6) - CacheOperationExpressionEvaluator 中的表达式求值]]></title>
+      <url>https://HaleLu.github.io/2020/07/spring-cache-6/</url>
+      <content type="html"><![CDATA[<p>上一章最后留了关于表达式 Evaluation 的部分没有讲，这期细讲。</p>
+<p>Cache 注解的 key、unless、condition 等都是支持 SpEL 的。而对这块的支持是在 CacheOperationExpressionEvaluator 中实现的。</p>
+<p>首先可以看到 CacheAspectSupport 中有一个 <code>evaluator</code> 变量，其定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> CacheOperationExpressionEvaluator evaluator = <span class="keyword">new</span> CacheOperationExpressionEvaluator();</span><br></pre></td></tr></table></figure>
+
+<p>接下来我们详细分析这个 <code>CacheOperationExpressionEvaluator</code>。</p>
+<p><em>最近工作有点忙，再次拖更，之后忙完这阵会补回来的。</em></p>
+<a id="more"></a>
+
+<h1 id="CacheOperationExpressionEvaluator"><a href="#CacheOperationExpressionEvaluator" class="headerlink" title="CacheOperationExpressionEvaluator"></a>CacheOperationExpressionEvaluator</h1><h2 id="基类-CachedExpressionEvaluator"><a href="#基类-CachedExpressionEvaluator" class="headerlink" title="基类 CachedExpressionEvaluator"></a>基类 CachedExpressionEvaluator</h2><p>定义了一个 protected 的静态内部类 ExpressionKey，实现了 Comparable 接口，包含 element（类型为 AnnotatedElementKey）和 expression（类型为 String）两个字段。</p>
+<p>定义了一个 parser ，由父类继承构造的时候赋值了一个 <code>new SpelExpressionParser()</code>。关于 SpelExpressionParser 此处不展开。</p>
+<p>定义了一个 parameterNameDiscoverer，赋值为一个 <code>new DefaultParameterNameDiscoverer()</code>。</p>
+<blockquote>
+<p>关于 DefaultParameterNameDiscoverer，是为了兼容低于 Java 8 的版本。在 Java 8 之前是没有反射的，使用的是 LocalVariableTableParameterNameDiscoverer，内部依赖 ASM 库实现（详见其 inspectClass 方法，此处不展开）；Java 8 以及之后使用的是 StandardReflectionParameterNameDiscoverer，直接使用反射即可。</p>
+</blockquote>
+<p>CachedExpressionEvaluator 的关键代码只有一段：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> Expression <span class="title">getExpression</span><span class="params">(Map&lt;ExpressionKey, Expression&gt; cache,</span></span></span><br><span class="line"><span class="function"><span class="params">        AnnotatedElementKey elementKey, String expression)</span> </span>&#123;</span><br><span class="line">    ExpressionKey expressionKey = createKey(elementKey, expression);</span><br><span class="line">    Expression expr = cache.get(expressionKey);</span><br><span class="line">    <span class="keyword">if</span> (expr == <span class="keyword">null</span>) &#123;</span><br><span class="line">        expr = getParser().parseExpression(expression);</span><br><span class="line">        cache.put(expressionKey, expr);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> expr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>尝试从 cache 获取表达式，不存在则由 parser 执行 parseExpression 并将结果缓存起来。</p>
+<h2 id="CacheOperationExpressionEvaluator-的相关数据结构"><a href="#CacheOperationExpressionEvaluator-的相关数据结构" class="headerlink" title="CacheOperationExpressionEvaluator 的相关数据结构"></a>CacheOperationExpressionEvaluator 的相关数据结构</h2><h3 id="CacheExpressionRootObject"><a href="#CacheExpressionRootObject" class="headerlink" title="CacheExpressionRootObject"></a>CacheExpressionRootObject</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Collection&lt;? extends Cache&gt; caches;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Method method;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Object[] args;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Object target;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Class&lt;?&gt; targetClass;</span><br></pre></td></tr></table></figure>
+
+<h3 id="CacheEvaluationContext"><a href="#CacheEvaluationContext" class="headerlink" title="CacheEvaluationContext"></a>CacheEvaluationContext</h3><p>CacheEvaluationContext 继承自 MethodBasedEvaluationContext，在其基础上对不可用变量 <code>unavailableVariables</code> 额外做了一级缓存。</p>
+<p>关于 MethodBasedEvaluationContext 的实现，是 SpEL 的部分，此处不展开。简单来说其将方法的参数注入上下文，提供了一个 lookupVariable 方法用于从上下文查找变量。</p>
+<h2 id="CacheOperationExpressionEvaluator-核心源码"><a href="#CacheOperationExpressionEvaluator-核心源码" class="headerlink" title="CacheOperationExpressionEvaluator 核心源码"></a>CacheOperationExpressionEvaluator 核心源码</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> EvaluationContext <span class="title">createEvaluationContext</span><span class="params">(Collection&lt;? extends Cache&gt; caches,</span></span></span><br><span class="line"><span class="function"><span class="params">        Method method, Object[] args, Object target, Class&lt;?&gt; targetClass, Object result,</span></span></span><br><span class="line"><span class="function"><span class="params">        BeanFactory beanFactory)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    CacheExpressionRootObject rootObject = <span class="keyword">new</span> CacheExpressionRootObject(</span><br><span class="line">            caches, method, args, target, targetClass);</span><br><span class="line">    Method targetMethod = getTargetMethod(targetClass, method);</span><br><span class="line">    CacheEvaluationContext evaluationContext = <span class="keyword">new</span> CacheEvaluationContext(</span><br><span class="line">            rootObject, targetMethod, args, getParameterNameDiscoverer());</span><br><span class="line">    <span class="keyword">if</span> (result == RESULT_UNAVAILABLE) &#123;</span><br><span class="line">        evaluationContext.addUnavailableVariable(RESULT_VARIABLE);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (result != NO_RESULT) &#123;</span><br><span class="line">        evaluationContext.setVariable(RESULT_VARIABLE, result);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (beanFactory != <span class="keyword">null</span>) &#123;</span><br><span class="line">        evaluationContext.setBeanResolver(<span class="keyword">new</span> BeanFactoryResolver(beanFactory));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> evaluationContext;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用 new 出来的 CacheExpressionRootObject 作为 rootObject，带上当前的方法和参数一起生成了一个 CacheEvaluationContext。</p>
+<p>其提供了三处需要进行 SpEL 求值的函数：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">key</span><span class="params">(String keyExpression, AnnotatedElementKey methodKey, EvaluationContext evalContext)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> getExpression(<span class="keyword">this</span>.keyCache, methodKey, keyExpression).getValue(evalContext);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">condition</span><span class="params">(String conditionExpression, AnnotatedElementKey methodKey, EvaluationContext evalContext)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> getExpression(<span class="keyword">this</span>.conditionCache, methodKey, conditionExpression).getValue(evalContext, <span class="keyword">boolean</span>.class);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">unless</span><span class="params">(String unlessExpression, AnnotatedElementKey methodKey, EvaluationContext evalContext)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> getExpression(<span class="keyword">this</span>.unlessCache, methodKey, unlessExpression).getValue(evalContext, <span class="keyword">boolean</span>.class);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最终由 generateKey 等方法调用，由 SpEL 表达式结合上下文计算出实际值。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>到这章为止，Spring Cache 的核心源码基本讲完了。</p>
+<p>Spring cache 通过 ProxyCachingConfiguration 配置。由 AnnotationCacheOperationSource 使用 SpringCacheAnnotationParser 将注解解析为 CacheOperation 并缓存。</p>
+<p>CacheOperationSourcePointcut 通过尝试使用 AnnotationCacheOperationSource 取 CacheOperation 来判断是否需要进入切面。</p>
+<p>CacheAspectSupport 作为拦截类，使用 AnnotationCacheOperationSource 获取到 CacheOperation，然后依赖 CacheResolver 等进行 Cache 解析，结合 CacheOperationExpressionEvaluator 进行表达式求值，最终执行 cache 的增删查操作。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> 技术 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 阅读 </tag>
+            
+            <tag> Spring </tag>
+            
+            <tag> Java </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[Spring Cache (5) - 核心部分 CacheAspectSupport]]></title>
       <url>https://HaleLu.github.io/2020/07/spring-cache-5/</url>
       <content type="html"><![CDATA[<p>上上篇还有一章 CacheInterceptor 的基类 CacheAspectSupport 没有细讲，这篇详细讲解一下。</p>
@@ -44,7 +102,7 @@
 <p>再将显式注解的 CachePutOperation 聚合到之前的 Put 操作集合中，依次调用 <code>cachePutRequest.apply(cacheValue)</code>。</p>
 <p>最后执行函数后清空缓存的 CacheEvicts 操作。然后返回之前的返回值。</p>
 <h3 id="没有仔细讲的细节"><a href="#没有仔细讲的细节" class="headerlink" title="没有仔细讲的细节"></a>没有仔细讲的细节</h3><p>在这个过程中，对返回值和异常穿插 wrap 和 unwrap 的处理，支持了有 Optional 的情况。</p>
-<p>关于例如 generateKey 这些设计到的表达式 Evaluation 的部分下章细讲。</p>
+<p>关于例如 generateKey 这些到的涉及表达式 Evaluation 的部分下章细讲。</p>
 ]]></content>
       
         <categories>

@@ -284,6 +284,143 @@
             
               
                 
+                <a class="post-title-link" href="/2020/07/spring-cache-6/" itemprop="url">
+                  Spring Cache (6) - CacheOperationExpressionEvaluator 中的表达式求值
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2020-07-19T01:17:49+08:00" content="2020-07-19">
+              2020-07-19
+            </time>
+          </span>
+
+          
+            <span class="post-category">
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2020/07/spring-cache-6/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/07/spring-cache-6/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+             <span id="/2020/07/spring-cache-6/" class="leancloud_visitors" data-flag-title="Spring Cache (6) - CacheOperationExpressionEvaluator 中的表达式求值">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>上一章最后留了关于表达式 Evaluation 的部分没有讲，这期细讲。</p>
+<p>Cache 注解的 key、unless、condition 等都是支持 SpEL 的。而对这块的支持是在 CacheOperationExpressionEvaluator 中实现的。</p>
+<p>首先可以看到 CacheAspectSupport 中有一个 <code>evaluator</code> 变量，其定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> CacheOperationExpressionEvaluator evaluator = <span class="keyword">new</span> CacheOperationExpressionEvaluator();</span><br></pre></td></tr></table></figure>
+
+<p>接下来我们详细分析这个 <code>CacheOperationExpressionEvaluator</code>。</p>
+<p><em>最近工作有点忙，再次拖更，之后忙完这阵会补回来的。</em></p>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2020/07/spring-cache-6/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+    
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2020/07/spring-cache-5/" itemprop="url">
                   Spring Cache (5) - 核心部分 CacheAspectSupport
                 </a>
@@ -525,138 +662,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2020/06/spring-cache-3/" itemprop="url">
-                  Spring Cache (3) - Pointcut、Advice 和 Advisor
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2020-06-26T21:47:57+08:00" content="2020-06-26">
-              2020-06-26
-            </time>
-          </span>
-
-          
-            <span class="post-category">
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/技术/" itemprop="url" rel="index">
-                    <span itemprop="name">技术</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2020/06/spring-cache-3/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/06/spring-cache-3/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-             <span id="/2020/06/spring-cache-3/" class="leancloud_visitors" data-flag-title="Spring Cache (3) - Pointcut、Advice 和 Advisor">
-               &nbsp; | &nbsp;
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               <span class="post-meta-item-text">阅读次数 </span>
-               <span class="leancloud-visitors-count"></span>
-              </span>
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="Spring-Cache-配置的-Pointcut、Advice-和-Advisor"><a href="#Spring-Cache-配置的-Pointcut、Advice-和-Advisor" class="headerlink" title="Spring Cache 配置的 Pointcut、Advice 和 Advisor"></a>Spring Cache 配置的 Pointcut、Advice 和 Advisor</h1><p>上篇讲到，Spring Cache 在 <code>AdviceMode.Proxy</code> 模式会注入 <code>AutoProxyRegistrar</code> 和 <code>ProxyCachingConfiguration</code> 这两个类，其中 <code>AutoProxyRegistrar</code> 是一个与 cache 功能无关的 AOP 类，已经在上一篇中介绍过。</p>
-<p>这篇将详细深入 <code>ProxyCachingConfiguration</code> 的配置类。</p>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2020/06/spring-cache-3/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-    
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -700,7 +705,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">44</span>
+              <span class="site-state-item-count">45</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
