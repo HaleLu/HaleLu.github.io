@@ -460,6 +460,52 @@ TODO -->
     </entry>
     
     <entry>
+      <title><![CDATA[分布式事务 - TCC 框架]]></title>
+      <url>https://HaleLu.github.io/2020/06/tcc-2/</url>
+      <content type="html"><![CDATA[<p>书接<a href="http://halelu.github.io/2020/06/tcc-1">上文</a>，聊聊 TCC 框架。</p>
+<blockquote>
+<p>再次声明：本文所述的 2PC、3PC、TCC 可能与网络上某些文章提到的不太一致（事实上这些文章之间也不统一），个人认为这种概念上的争论不是很重要，本文试图描述的的是一种实际的、可实现、具有实用价值的 2PC、3PC 或 TCC 框架。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="TCC-框架"><a href="#TCC-框架" class="headerlink" title="TCC 框架"></a>TCC 框架</h2><h3 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h3><p>个人认为，TCC 是一种实现，Github 上有诸多具体的实现，例如 <a href="https://github.com/changmingxie/tcc-transaction" target="_blank" rel="noopener">https://github.com/changmingxie/tcc-transaction</a> 。</p>
+<p>TCC 指的就是 Try、Confirm、Cancel 三个操作，基本类似两阶段提交。由事务管理方发起向所有参与者发起 try 请求，根据 try 请求的结果决定全部 confirm 或是全部 cancel。</p>
+<p>TCC 框架一般需要使用数据库持久化记录事务数据，跟踪整个事务的执行状态，并在事务失败后补偿重试。具有一定的容灾能力。</p>
+<p>TCC 不仅可以认为是两阶段事务的实现，在之前加上资源检查的步骤（也就是上文所说的第 0 步），也同样可以认为是三阶段事务的实现。</p>
+<h3 id="TCC-框架对参与者的要求"><a href="#TCC-框架对参与者的要求" class="headerlink" title="TCC 框架对参与者的要求"></a>TCC 框架对参与者的要求</h3><h4 id="幂等性"><a href="#幂等性" class="headerlink" title="幂等性"></a>幂等性</h4><p>在上一篇也提到过，所有操作 Try、Confirm、Cancel 三个方法均需满足保证幂等。一旦发生网络波动重试、或事务补偿执行，不幂等的接口重复执行后便会有数据正确性的风险。</p>
+<h4 id="二阶段设计"><a href="#二阶段设计" class="headerlink" title="二阶段设计"></a>二阶段设计</h4><p>在 TCC 框架内，所有的参与者的业务逻辑都需按照二阶段设计。一阶段锁定和预备资源、二阶段执行提交（confirm）或释放资源（cancel）。</p>
+<h4 id="锁定事务不隔离"><a href="#锁定事务不隔离" class="headerlink" title="锁定事务不隔离"></a>锁定事务不隔离</h4><p>仍然以用户购买商品举例，假设用户账户余额为 10 元，同时下了价值 2 和 3 元的两单。一阶段的锁定应当是分别进行的，也就是说，如果两单同时执行一阶段，一共会有 5 元成为冻结金额。（与数据库的事务隔离不同，所以称之为事务不隔离）</p>
+<h4 id="允许“空取消”"><a href="#允许“空取消”" class="headerlink" title="允许“空取消”"></a>允许“空取消”</h4><p>考虑一种情况，如果执行者由于网络问题并未收到过阶段 1 的 Try 请求，却收到了阶段 2 的 Cancel 请求（不可能是 Confirm，想想为什么）。这种情况下就是我们所说的“空取消”。应当跳过执行。</p>
+<h4 id="防悬挂"><a href="#防悬挂" class="headerlink" title="防悬挂"></a>防悬挂</h4><p>这种情况比较少见。在某些极端情况下，Cancel 可能比 Try 先到达（或先被处理）。由于先到达的 Cancel 请求被当做了“空取消”处理了，所以只要在“空取消”时短暂记录事务，对后到的 try 拒绝处理就可以了。</p>
+<h3 id="事务恢复"><a href="#事务恢复" class="headerlink" title="事务恢复"></a>事务恢复</h3><p>以 tcc-transaction 为例。</p>
+<h4 id="事务恢复配置"><a href="#事务恢复配置" class="headerlink" title="事务恢复配置"></a>事务恢复配置</h4><p>包含几个关键配置项：</p>
+<ul>
+<li>maxRetryCount 最大重试次数，如果重试完依然失败，tcc-transaction 的做法是打印错误日志，交给人工处理。默认 30 次</li>
+<li>recoverDuration 单个事务恢复重试的间隔时间，默认 120s</li>
+<li>cronExpression 定时任务 cron 表达式，默认 <code>0 */1 * * * ?</code>，每分钟执行一次。</li>
+<li>delayCancelExceptions 延迟取消异常类的集合，默认包含 <code>OptimisticLockException.class</code> 和 <code>SocketTimeoutException.class</code></li>
+</ul>
+<h4 id="事务恢复流程"><a href="#事务恢复流程" class="headerlink" title="事务恢复流程"></a>事务恢复流程</h4><p>由 Quartz 调度事务恢复定时任务，并禁止并发。</p>
+<p>事务在重试时会乐观锁更新，同时只有一个应用节点能更新成功。</p>
+<h3 id="优化空间"><a href="#优化空间" class="headerlink" title="优化空间"></a>优化空间</h3><h4 id="立即返回"><a href="#立即返回" class="headerlink" title="立即返回"></a>立即返回</h4><p>在需要极致响应的情况下，一阶段结束后可以立刻返回，将二阶段交给线程池或其他异步方式执行。因为一阶段收到所有返回后，就已经可以确认事务能否执行，接下来交给异步任务、失败重试和事务恢复机制即可。</p>
+]]></content>
+      
+        <categories>
+            
+            <category> 技术 </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> 分布式事务 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
       <title><![CDATA[分布式事务 - 两阶段提交和三阶段提交]]></title>
       <url>https://HaleLu.github.io/2020/06/tcc-1/</url>
       <content type="html"><![CDATA[<h1 id="分布式事务"><a href="#分布式事务" class="headerlink" title="分布式事务"></a>分布式事务</h1><p>想聊聊分布式事务。</p>
